@@ -5,9 +5,12 @@
 */
 
 #include<iostream>
+#include <sstream>
 #include<vector>
 #include<ctime>
 #include<string.h>
+#include<string>
+
 #define ll long long
 using namespace std;
 
@@ -74,7 +77,19 @@ Node* head_common=new Node("Common task list");
 //defination of the priority function
 int priority(Node*temp,Node*temp_insert)
 {
+   // comparing the eadlineslines
+    if (temp->time > temp_insert->time)
+        return 1;
+    else if (temp->time < temp_insert->time)
+        return 0;
 
+    // deadlines are equal isliye compare importance levels
+    if (temp->imp_lvl < temp_insert->imp_lvl)
+        return 1;
+    else
+        return 0;
+
+   
 }
 
 
