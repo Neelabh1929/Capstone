@@ -136,17 +136,7 @@ int priority(Node*temp,Node*temp_insert)
 
 void insert_task_common(string deadline,string type_by_user,string message,ll imp_lvl_by_user)
 {
-    // Node* temp_insert=new Node(deadline,type_by_user,message,imp_lvl_by_user);
-    // Node* temp=head_common;
-    // while(temp->next!=NULL || priority(temp,temp_insert)==1)
-    // {
-    //     temp=temp->next;
-    // }
-    // //change the Next and prev pointers to insert the node in the list
-    // temp_insert->prev=temp;
-    // temp_insert->next=temp->next;
-    // temp->next=temp_insert;
-    // temp_insert->next->prev=temp_insert;
+   
     Node* temp_insert = new Node(deadline, type_by_user, message, imp_lvl_by_user);
     Node* temp = head_common;
     while (temp->next != NULL && priority(temp, temp_insert) == 1)
