@@ -74,16 +74,56 @@ class Node
 Node* head_common=new Node("Common task list");
 
 
+/***************************priority function block*************************************/
+int stringToInt(const string& str) {
+    int value = 0;
+    for (char c : str) {
+        if (c >= '0' && c <= '9') {
+            value = value * 10 + (c - '0');
+        } else {
+            // Handle unexpected character
+            return -1; // Returning -1 or any error code as per requirement
+        }
+    }
+    return value;
+}
+
+void extractDateComponents(const string& date, int& day, int& month, int& year) {
+    day = stringToInt(date.substr(0, 2));
+    month = stringToInt(date.substr(2, 2));
+    year = stringToInt(date.substr(4, 2));
+    //used substr as it works on only two arguments takes the initial position from where to start and the number of steps thus easy to extrat 
+}
+
 //defination of the priority function
 int priority(Node*temp,Node*temp_insert)
 {
-   // comparing the eadlineslines
-    if (temp->time > temp_insert->time)
+   int day1, month1, year1, day2, month2, year2;
+
+    // date components from the current node temp
+    extractDateComponents(temp->time, day1, month1, year1);
+    // date components from the node tempinsert
+    extractDateComponents(temp_insert->time, day2, month2, year2);
+
+    // Comparing year
+    if (year1 < year2)
         return 1;
-    else if (temp->time < temp_insert->time)
+    else if (year1 > year2)
         return 0;
 
-    // deadlines are equal isliye compare importance levels
+    // Compareng month
+    if (month1 < month2)
+        return 1;
+    else if (month1 > month2)
+        return 0;
+
+    // Comparing day
+    if (day1 < day2)
+        return 1;
+    else if (day1 > day2)
+        return 0;
+
+    // If dates are equa then compare importance levels   ***still to update for more than 2
     if (temp->imp_lvl < temp_insert->imp_lvl)
         return 1;
     else
