@@ -3,7 +3,7 @@
 Contributors:
 (Team ASAN)
 * Neelabh1929 (Neelabh Rana)
-* Atik-9957 (Atik Vohra)
+* atikdagu (Atik Vohra)
 * sohamMevada (Soham Mevada)
 * akshatbhatt51 (Akshat Bhatt)
 
