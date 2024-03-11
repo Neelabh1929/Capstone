@@ -1,0 +1,218 @@
+#include<iostream>
+#include<bits/stdc++.h>
+#include<sys/stat.h>
+#include<sys/types.h>
+#include<time.h>
+#include<math.h>
+using namespace std;
+
+class Date
+{
+	private:
+		int DD;
+		int MM;
+		int YYYY;
+	public:
+		Date()//constructor
+		{
+			bool Correct=false;
+			while(!Correct)
+			{
+				cout<<"Enter Day of Task"<<endl;
+				cin>>DD;
+				cout<<"Enter Month of Task"<<endl;
+				cin>>MM;
+				cout<<"Enter Year of Task"<<endl;
+				cin>>YYYY;
+				if(DD==29&&MM==2&&YYYY%4==0)
+				{
+					Correct=true;
+				}
+				else if(DD==31&&(MM==1||MM==3||MM==5||MM==7||MM==8||MM==10||MM==12))
+				{
+					Correct=true;
+				}
+				else if(DD==30&&(MM==4||MM==6||MM==9||MM==11)&&MM!=2)
+				{
+					Correct=true;
+				}
+				else if(1<=DD&&DD<=30&&MM!=2)
+				{
+					Correct=true;
+				}
+				else
+				{
+					Correct=false;
+					cout<<"Enter correct day"<<endl;
+				}	
+			}
+			
+		}
+		char* ShowDateStr()//used for creating file which stores all the times and task
+		{
+			char date[9];
+			int a=DD;
+			for(int i=1;i>=0;i--)
+			{
+				date[i]=(a%10)+48;
+				a=a/10;
+				
+			}
+			int b=MM;
+			for(int i=3;i>=2;i--)
+			{
+				date[i]=(b%10)+48;
+				b=b/10;
+				
+			}
+			int c=YYYY;
+			for(int i=7;i>=4;i--)
+			{
+				date[i]=(c%10)+48;
+				c=c/10;
+				
+			}
+			date[8]=0;
+			return date;
+		}
+		int ShowDateInt()//used for sorting
+		{
+			int a=0;
+			int b=YYYY,c=MM,d=DD;
+			int i=0;
+			for(i=0;i<4;i++)
+			{
+				a+=(b%10)*pow(10,i);
+				b=b/10;	
+			}
+			for(;i<6;i++)
+			{
+				a+=(c%10)*pow(10,i);
+				c=c/10;
+			}
+			for(;i<8;i++)
+			{
+				a+=(d%10)*pow(10,i);
+				d=d/10;
+			}
+			return a;
+		}
+};
+
+class Time
+{
+	private:
+		int HH;
+		int MM;
+		int SS;
+	public:
+		Time()
+		{
+			cout<<"Enter Time in 24hr format"<<endl;
+			cout<<"Midnight is 00:00:00"<<endl;
+			cout<<"The range is 00:00:00 till 23:59:59"<<endl;
+			bool Correct=false;
+			while(Correct==false)
+			{
+				cout<<"Enter the hour(0,23)"<<endl;
+				cin>>HH;
+				cout<<"Enter the minute(0,59)"<<endl;
+				cin>>MM;
+				cout<<"Enter the seconds(0,59)"<<endl;
+				cin>>SS;
+				if(0<=HH&&HH<24&&0<=MM&&MM<59&&0<=SS&&SS<59)
+				{
+					Correct=true;
+				}
+				else
+				{
+					cout<<"Enter valid Time"<<endl;
+				}
+			}
+		}
+		int ShowTimeInt()//used in sorting
+		{
+			int a=0,b,c,d;
+			b=SS;
+			c=MM;
+			d=HH;
+			for(int i=0;i<6;i++)
+			{
+					if(0<=i&&i<2)
+					{
+						a=a+(b%10)*pow(10,i);
+						b=b/10;	
+					}
+					else if(2<=i&&i<4)
+					{
+						a=a+(c%10)*pow(10,i);
+						c=c/10;
+					}
+					else
+					{
+						a=a+(d%10)*pow(10,i);
+						d=d/10;
+					}
+			}
+			return a;
+		}
+		char* ShowTimeStr()//used in file
+		{
+			char s[7];
+			int i=0,b,c,d;
+			b=SS;
+			c=MM;
+			d=HH;
+			for(i=5;i>=4;i--)
+			{
+				s[i]=(b%10)+48;
+				b=b/10;
+			}
+			for(i=3;i>=2;i--)
+			{
+				s[i]=(c%10)+48;
+				c=c/10;
+			}
+			for(i=1;i>=0;i--)
+			{
+				s[i]=(d%10)+48;
+				d=d/10;
+			}
+			s[6]=0;
+			return s;
+		}
+};
+
+class Task
+{
+	private:
+		//int time=0;
+		int priority;
+		char task[50];
+		bool Linked=false;
+		char date[8];
+		char time[6];
+		bool taskDone=false;
+		bool ExeStat=false;
+		
+	public:
+			
+};
+
+int main()
+{
+		Date A;
+		//Time B;
+		
+		char *str,c[9];
+		str=A.ShowDateStr();
+		int i=-1;
+		do
+		{
+			++i;
+			c[i]=*(str+i);	
+		}
+		while(*(str+i)!=0);
+		mkdir(c);
+	return 0;
+}
