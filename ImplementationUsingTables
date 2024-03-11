@@ -40,6 +40,10 @@ class Date
 				{
 					Correct=true;
 				}
+                                else if(1<=DD&&DD<=28&&MM==2)
+				{
+					Correct=true;
+				}
 				else
 				{
 					Correct=false;
@@ -267,5 +271,6 @@ int main()
 		}
 		while(*(str+i)!=0);
 		mkdir(c);
+                
 	return 0;
 }
