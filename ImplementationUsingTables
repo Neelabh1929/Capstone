@@ -40,6 +40,10 @@ class Date
 				{
 					Correct=true;
 				}
+				else if(1<=DD&&DD<=28&&MM==2)
+				{
+					Correct=true;
+				}
 				else
 				{
 					Correct=false;
@@ -194,7 +198,6 @@ class Task
 		char time[6];
 		bool taskDone=false;
 		bool ExeStat=false;
-		
 	public:
 			
 };
@@ -213,6 +216,11 @@ int main()
 			c[i]=*(str+i);	
 		}
 		while(*(str+i)!=0);
-		mkdir(c);
+		char d[21];
+		d[0]=0;
+		strcat(d,"C:/Schedule/");
+		strcat(d,c);
+		mkdir("C:/Schedule");
+		mkdir(d);
 	return 0;
 }
