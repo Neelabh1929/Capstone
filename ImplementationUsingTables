@@ -40,7 +40,7 @@ class Date
 				{
 					Correct=true;
 				}
-                                else if(1<=DD&&DD<=28&&MM==2)
+				else if(1<=DD&&DD<=28&&MM==2)
 				{
 					Correct=true;
 				}
@@ -259,7 +259,7 @@ class Task
 int main()
 {
 		Date A;
-		//Time B;
+		Time B;
 		
 		char *str,c[9];
 		str=A.ShowDateStr();
@@ -270,13 +270,22 @@ int main()
 			c[i]=*(str+i);	
 		}
 		while(*(str+i)!=0);
-char d[21];
+		char d[32];
 		d[0]=0;
 		strcat(d,"C:/Schedule/");
 		strcat(d,c);
 		mkdir("C:/Schedule");
 		mkdir(d);
-		mkdir(c);
-                
+		char e[11];
+		char *s;
+		s=B.ShowTimeStr();
+		e[0]=0;
+		strcat(e,s);
+		strcat(e,".txt");
+		strcat(d,"/");
+		strcat(d,e);
+		FILE* f;
+		f=fopen(d,"w");
+		fclose(f);
 	return 0;
 }
