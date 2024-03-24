@@ -10,6 +10,7 @@
 #include <vector>
 #include <ctime>
 #include <string.h>
+#include<fstream>
 #define ll long long
 using namespace std;
 
@@ -68,6 +69,7 @@ public:
     friend void createlist();
     friend int priority(Node *, Node *);
     friend void print_common_list();
+    friend void writeDataToFile();
 };
 
 Node *head_common = new Node("Common task list");
@@ -234,7 +236,7 @@ void print_common_list()
             cout << endl;
         }
 
-        cout << "List over" << endl;
+        cout << " ******* List over *******" << endl;
     }
     else
     {
@@ -242,15 +244,112 @@ void print_common_list()
     }
 }
 
+// function to write data to the file
+void writeDataToFile()
+{
+    ofstream file("task_data.txt"); // Open the file named "task_data.txt" for writing
+    if (file.is_open())
+    {
+        Node *temp = head_common->next;
+        while (temp != NULL)
+        {
+            // Replace occurrences of "$#" with "@@" to avoid conflicts
+            string deadline = temp->time;
+            string type = temp->type;
+            string message = temp->message;
+            ll imp_lvl = temp->imp_lvl;
+            size_t pos;
+            while ((pos = deadline.find("$#")) != string::npos)
+            {
+                deadline.replace(pos, 2, "@@");
+            }
+            while ((pos = type.find("$#")) != string::npos)
+            {
+                type.replace(pos, 2, "@@");
+            }
+            while ((pos = message.find("$#")) != string::npos)
+            {
+                message.replace(pos, 2, "@@");
+            }
+            // Write task data to the file
+            file << deadline << "$#" << type << "$#" << message << "$#" << imp_lvl << '\n';
+            temp = temp->next;
+        }
+        file.close(); // Close the file after writing
+    }
+    /* else
+    {
+        cout << "Unable to open file for writing." << endl;
+    } */
+}
+
+//function to retrieve data from file
+void loadDataFromFile()
+{
+    ifstream file("task_data.txt");
+    if (file.is_open())
+    {
+        string line;
+        while (getline(file, line))
+        {
+            // Replace occurrences of "$#" with a different delimiter '|'
+            size_t pos;
+            while ((pos = line.find("$#")) != string::npos)
+            {
+                line.replace(pos, 2, "|"); // Replace "$#" with '|'
+            }
+            // Tokenize the modified line using '|' as the delimiter
+            stringstream ss(line);
+            string deadline, type, message, imp_lvl_str;
+            if (getline(ss, deadline, '|') &&
+                getline(ss, type, '|') &&
+                getline(ss, message, '|') &&
+                getline(ss, imp_lvl_str, '|'))
+            {
+                ll imp_lvl = stoll(imp_lvl_str); // Convert importance level string to long long
+                insert_task_common(deadline, type, message, imp_lvl); // Insert task into the linked list
+            }
+            else
+            {
+                cout << "Invalid line in data file: " << line << endl;
+            }
+        }
+        file.close();
+    }
+    else
+    {
+        cout << "No existing data file found. Starting with an empty task list." << endl;
+    }
+}
+
+//funcction to erase all the tasks from the file
+
+void eraseFileContents(const string &filename)
+{
+    ofstream file(filename, ofstream::out | ofstream::trunc);
+    if (file.is_open())
+    {
+        file.close();
+        cout << "File contents erased successfully." << endl;
+    }
+    else
+    {
+        cerr << "Unable to open file for erasing." << endl;
+    }
+}
+
+
 int main()
 {
+    loadDataFromFile();
     ll x = 1;
     while (1)
     {
         cout << endl;
         cout << "Enter 1 to insert a task." << endl;
         cout << "Enter 2 to view the whole list of task." << endl;
-        cout << "Enter 3 to exit." << endl;
+        cout << "Enter 3 to remove all the previous tasks" << endl;
+        cout << "Enter 4 to exit." << endl;
         ll y;
         cin >> y;
         switch (y)
@@ -268,9 +367,17 @@ int main()
         }
         case 3:
         {
+            eraseFileContents("task_data.txt");
+            break;
+        }
+        case 4:
+        {
+            writeDataToFile();
             goto end;
             break;
         }
+        default:
+        cout<<"Enter valid option."<<endl;
         }
     }
 end:
