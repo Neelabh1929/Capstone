@@ -41,9 +41,12 @@ public:
         next = NULL;
         prev = NULL;
     }
-    Node(string t, string type1, string message1)
+    
+   
+    Node(string t, string t1,string type1, string message1)
     {
         time = t;
+        time1=t1;
         type = type1;
         message = message1;
         // imp_lvl=0 is considered as the most common task
@@ -51,6 +54,17 @@ public:
         next = NULL;
         prev = NULL;
     }
+    Node(string type1, string message1)
+    {
+       
+        type = type1;
+        message = message1;
+        // imp_lvl=0 is considered as the most common task
+        imp_lvl = 0;
+        next = NULL;
+        prev = NULL;
+    }
+   
     Node(string type1, ll i)
     {
         time = "";
@@ -66,7 +80,7 @@ public:
         next = NULL;
         prev = NULL;
     }
-    friend void insert_task_common(string, string, string, ll);
+    friend void insert_task_common(string,string , string, string, ll);
     friend void createlist();
     friend int priority(Node *, Node *);
     friend void print_common_list();
@@ -168,9 +182,7 @@ int priority(Node *temp, Node *temp_insert)
     else if (seconds1 > seconds2)
         return 0;
 
-    }
-
-if (hours1 == hours2 && minutes1 == minutes2 && seconds1 == seconds2){
+    if (hours1 == hours2 && minutes1 == minutes2 && seconds1 == seconds2){
     // If dates are equal then compare importance levels   ***still to update for more than 2
     if (temp->imp_lvl > temp_insert->imp_lvl)
         return 1;
@@ -179,14 +191,18 @@ if (hours1 == hours2 && minutes1 == minutes2 && seconds1 == seconds2){
 
     // Add the comparision of time at particular day as well for comparision like for hour ,minutes.
 }
+
+}
+
+
 }
 
 /******************* Priority function block over ********************/
 
-void insert_task_common(string deadline, string type_by_user, string message, ll imp_lvl_by_user)
+void insert_task_common(string deadlinedate, string deadlinetime string type_by_user, string message, ll imp_lvl_by_user)
 {
 
-    Node *temp_insert = new Node(deadline, type_by_user, message, imp_lvl_by_user);
+    Node *temp_insert = new Node( deadlinedate, deadlinetime , type_by_user, message, imp_lvl_by_user);
 
     Node *temp = head_common;
 
@@ -215,10 +231,13 @@ void insert_task()
     ll imp_lvl_user;
     cin >> imp_lvl_user;
 
-    string deadline, message;
-    cout << "Enter the Deadline of the task:" << endl;
+    string deadlinedate,deadlinetime, message;
+    cout << "Enter the Deadline date of the task:" << endl;
     cin.ignore(); // to ignore the newline character from the buffer
-    getline(cin, deadline);
+    getline(cin, deadlinedate);
+    cout << "Enter the Deadline time of the task:" << endl;
+    cin.ignore(); // to ignore the newline character from the buffer
+    getline(cin, deadlinetime);
 
     cout << "Enter the message you want with the remainder:" << endl;
     cin.ignore(); // to ignore the newline character from the buffer
@@ -229,7 +248,7 @@ void insert_task()
     // To avoid duplications caused by case differences
     type_task.insert(task_type_user);
 
-    insert_task_common(deadline, task_type_user, message, imp_lvl_user);
+    insert_task_common(deadlinedate,deadlinetime, task_type_user, message, imp_lvl_user);
 
     /* checkig wether the the type entered by the user is Currently Present or not. If not then we will create a new head node with the particular type */
 
@@ -269,7 +288,9 @@ void print_common_list()
         while (temp != NULL)
         {
             cout << "Type: " << temp->type << endl;
-            cout << "Deadline: " << temp->time << endl;
+            cout << "Deadline Date: " << temp->time << endl;
+            cout << "Deadline time: " << temp->time1 << endl;
+
             cout << "Message: " << temp->message << endl;
             cout << "Importance level: " << temp->imp_lvl << endl;
             temp = temp->next;
@@ -294,15 +315,22 @@ void writeDataToFile()
         while (temp != NULL)
         {
             // Replace occurrences of "$#" with "@@" to avoid conflicts
-            string deadline = temp->time;
+            string deadlinedate = temp->time;
+            string deadlinetime = temp->time1;
+
             string type = temp->type;
             string message = temp->message;
             ll imp_lvl = temp->imp_lvl;
             size_t pos;
-            while ((pos = deadline.find("$#")) != string::npos)
+            while ((pos = deadlinedate.find("$#")) != string::npos)
             {
-                deadline.replace(pos, 2, "@@");
+                deadlinedate.replace(pos, 2, "@@");
             }
+            while ((pos = deadlinetime.find("$#")) != string::npos)
+            {
+                deadlinetime.replace(pos, 2, "@@");
+            }
+
             while ((pos = type.find("$#")) != string::npos)
             {
                 type.replace(pos, 2, "@@");
@@ -312,7 +340,7 @@ void writeDataToFile()
                 message.replace(pos, 2, "@@");
             }
             // Write task data to the file
-            file << deadline << "$#" << type << "$#" << message << "$#" << imp_lvl << '\n';
+            file << deadlinedate << "$#" <<deadlinetime<< "$#" << type << "$#" << message << "$#" << imp_lvl << '\n';
             temp = temp->next;
         }
         file.close(); // Close the file after writing
@@ -340,14 +368,15 @@ void loadDataFromFile()
             }
             // Tokenize the modified line using '|' as the delimiter
             stringstream ss(line);
-            string deadline, type, message, imp_lvl_str;
-            if (getline(ss, deadline, '|') &&
+            string deadlinedate,deadlinetime, type, message, imp_lvl_str;
+            if (getline(ss, deadlinedate, '|') &&
+                getline(ss, deadlinetime, '|')&&
                 getline(ss, type, '|') &&
                 getline(ss, message, '|') &&
                 getline(ss, imp_lvl_str, '|'))
             {
                 ll imp_lvl = stoll(imp_lvl_str); // Convert importance level string to long long
-                insert_task_common(deadline, type, message, imp_lvl); // Insert task into the linked list
+                insert_task_common(deadlinedate,deadlinetime, type, message, imp_lvl); // Insert task into the linked list
             }
             else
             {
