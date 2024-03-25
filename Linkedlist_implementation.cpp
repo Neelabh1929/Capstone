@@ -85,6 +85,7 @@ public:
     friend int priority(Node *, Node *);
     friend void print_common_list();
     friend void writeDataToFile();
+    friend void eraseFileContents(const string&);
 };
 
 Node *head_common = new Node("Common task list");
@@ -193,13 +194,12 @@ int priority(Node *temp, Node *temp_insert)
 }
 
 }
-
-
+return 0;
 }
 
 /******************* Priority function block over ********************/
 
-void insert_task_common(string deadlinedate, string deadlinetime string type_by_user, string message, ll imp_lvl_by_user)
+void insert_task_common(string deadlinedate, string deadlinetime,string type_by_user, string message, ll imp_lvl_by_user)
 {
 
     Node *temp_insert = new Node( deadlinedate, deadlinetime , type_by_user, message, imp_lvl_by_user);
@@ -240,7 +240,6 @@ void insert_task()
     getline(cin, deadlinetime);
 
     cout << "Enter the message you want with the remainder:" << endl;
-    cin.ignore(); // to ignore the newline character from the buffer
     getline(cin, message);
 
     transform(task_type_user.begin(), task_type_user.end(), task_type_user.begin(), ::tolower);
@@ -385,10 +384,10 @@ void loadDataFromFile()
         }
         file.close();
     }
-    else
+   /*  else
     {
         cout << "No existing data file found. Starting with an empty task list." << endl;
-    }
+    } */
 }
 
 //funcction to erase all the tasks from the file
@@ -399,6 +398,7 @@ void eraseFileContents(const string &filename)
     if (file.is_open())
     {
         file.close();
+        head_common->next=NULL;
         cout << "File contents erased successfully." << endl;
     }
     else
