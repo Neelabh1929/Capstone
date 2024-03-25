@@ -22,7 +22,7 @@ set<string> type_task;
 
 class Node
 {
-    string time, type, message;
+    string time,time1, type, message;
     ll imp_lvl;
 
     // next and prev pointers for traversing and other things
@@ -31,9 +31,10 @@ class Node
 
     // Constructor for the node
 public:
-    Node(string t, string type1, string message1, ll i)
+    Node(string t, string t1, string type1, string message1, ll i)
     {
         time = t; // time means deadline of the task
+        time1=t1;
         type = type1;
         message = message1;
         imp_lvl = i;
@@ -103,17 +104,26 @@ void extractDateComponents(const string &date, int &day, int &month, int &year)
     year = stringToInt(date.substr(4, 2));
     // used substr as it works on only two arguments takes the initial position from where to start and the number of steps thus easy to extract
 }
+void extractTimeComponents(const string &time, int &hours, int &minutes, int &seconds)
+{
+    hours = stringToInt(time.substr(0, 2));
+    minutes = stringToInt(time.substr(2, 2));
+    seconds = stringToInt(time.substr(4, 2));
+}
 
 // defination of the priority function
 int priority(Node *temp, Node *temp_insert)
 {
-    int day1, month1, year1, day2, month2, year2;
+    int day1, month1, year1;
+    int day2, month2, year2;
+
+   
 
     // date components from the current node temp
     extractDateComponents(temp->time, day1, month1, year1);
-    // date components from the node tempinsert
+     // date components from the node tempinsert
     extractDateComponents(temp_insert->time, day2, month2, year2);
-
+ 
     // Comparing year
     if (year1 < year2)
         return 1;
@@ -132,6 +142,35 @@ int priority(Node *temp, Node *temp_insert)
     else if (day1 > day2)
         return 0;
 
+
+    if (day1 == day2 && month1 == month2 && year1 == year2)
+    {
+        int hours1, minutes1, seconds1, hours2, minutes2, seconds2;
+        extractTimeComponents(temp->time1, hours1, minutes1, seconds1);
+        extractTimeComponents(temp_insert->time1, hours2, minutes2, seconds2);
+
+        // Compare hours, then minutes, then seconds
+        // Comparing year
+    if (hours1 < hours2)
+        return 1;
+    else if (hours1 > hours2)
+        return 0;
+
+    // Compareng month
+    if (minutes1 < minutes2)
+        return 1;
+    else if (minutes1 > minutes2)
+        return 0;
+
+    // Comparing day
+    if (seconds1 < seconds2)
+        return 1;
+    else if (seconds1 > seconds2)
+        return 0;
+
+    }
+
+if (hours1 == hours2 && minutes1 == minutes2 && seconds1 == seconds2){
     // If dates are equal then compare importance levels   ***still to update for more than 2
     if (temp->imp_lvl > temp_insert->imp_lvl)
         return 1;
@@ -139,6 +178,7 @@ int priority(Node *temp, Node *temp_insert)
         return 0;
 
     // Add the comparision of time at particular day as well for comparision like for hour ,minutes.
+}
 }
 
 /******************* Priority function block over ********************/
