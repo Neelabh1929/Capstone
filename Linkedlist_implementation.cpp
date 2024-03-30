@@ -15,6 +15,9 @@
 #define ll long long
 using namespace std;
 
+char yellow[]={0x1b,'[','0',';','3', '3', 'm',0};//for text coloring
+char red[]={0x1b,'[','0',';','3','1','m',0};//for text coloring
+
 // This set will store the type of the tasks already stored
 set<string> type_task;
 
@@ -88,6 +91,7 @@ public:
     friend void eraseFileContents(const string &);
     friend bool comparetime12hr(Node *current, ll chour, ll cminute, ll csecond, ll cdate, ll cmonth, ll cyear);
     friend void reminder12hr();
+    friend void remove_tasks();
 };
 
 Node *head_common = new Node("Common task list");
@@ -118,7 +122,7 @@ void extractDateComponents(const string &date, int &day, int &month, int &year)
 {
     day = stringToInt(date.substr(0, 2));
     month = stringToInt(date.substr(2, 2));
-    year = stringToInt(date.substr(4, 2));
+    year = stringToInt(date.substr(4, 4));
     // used substr as it works on only two arguments takes the initial position from where to start and the number of steps thus easy to extract
 }
 void extractTimeComponents(const string &time, int &hours, int &minutes, int &seconds)
@@ -156,35 +160,35 @@ int priority(Node *temp, Node *temp_insert)
         return 1;
     else if (day1 > day2)
         return 0;
-        int hours1, minutes1, seconds1, hours2, minutes2, seconds2;
-        extractTimeComponents(temp->time1, hours1, minutes1, seconds1);
-        extractTimeComponents(temp_insert->time1, hours2, minutes2, seconds2);
+    int hours1, minutes1, seconds1, hours2, minutes2, seconds2;
+    extractTimeComponents(temp->time1, hours1, minutes1, seconds1);
+    extractTimeComponents(temp_insert->time1, hours2, minutes2, seconds2);
 
-        // Compare hours, then minutes, then seconds
-        // Comparing year
-        if (hours1 < hours2)
-            return 1;
-        else if (hours1 > hours2)
-            return 0;
+    // Compare hours, then minutes, then seconds
+    // Comparing year
+    if (hours1 < hours2)
+        return 1;
+    else if (hours1 > hours2)
+        return 0;
 
-        // Compareng month
-        if (minutes1 < minutes2)
-            return 1;
-        else if (minutes1 > minutes2)
-            return 0;
+    // Compareng month
+    if (minutes1 < minutes2)
+        return 1;
+    else if (minutes1 > minutes2)
+        return 0;
 
-        // Comparing day
-        if (seconds1 < seconds2)
-            return 1;
-        else if (seconds1 > seconds2)
-            return 0;
-            // If dates are equal then compare importance levels   ***still to update for more than 2
-            if (temp->imp_lvl > temp_insert->imp_lvl)
-                return 1;
-            else
-                return 0;
+    // Comparing day
+    if (seconds1 < seconds2)
+        return 1;
+    else if (seconds1 > seconds2)
+        return 0;
+    // If dates are equal then compare importance levels   ***still to update for more than 2
+    if (temp->imp_lvl > temp_insert->imp_lvl)
+        return 1;
+    else
+        return 0;
 
-            // Add the comparision of time at particular day as well for comparision like for hour ,minutes.
+    // Add the comparision of time at particular day as well for comparision like for hour ,minutes.
     return 0;
 }
 
@@ -227,7 +231,6 @@ void insert_task()
     cin.ignore(); // to ignore the newline character from the buffer
     getline(cin, deadlinedate);
     cout << "Enter the Deadline time of the task:" << endl;
-    cin.ignore(); // to ignore the newline character from the buffer
     getline(cin, deadlinetime);
 
     cout << "Enter the message you want with the remainder:" << endl;
@@ -243,12 +246,15 @@ void insert_task()
 
 void print_common_list()
 {
+    ll cnt = 1;
     if (head_common->next != NULL)
     {
         Node *temp = head_common->next;
         cout << endl;
         while (temp != NULL)
         {
+            cout <<yellow<< "TASK: " << cnt++ << endl;
+            cout << "\033[0m"; 
             cout << "Type: " << temp->type << endl;
             cout << "Deadline Date: " << temp->time << endl;
             cout << "Deadline time: " << temp->time1 << endl;
@@ -276,7 +282,6 @@ void writeDataToFile()
         Node *temp = head_common->next;
         while (temp != NULL)
         {
-            // Replace occurrences of "$#" with "@@" to avoid conflicts
             string deadlinedate = temp->time;
             string deadlinetime = temp->time1;
 
@@ -301,16 +306,11 @@ void writeDataToFile()
             {
                 message.replace(pos, 2, "@@");
             }
-            // Write task data to the file
             file << deadlinedate << "$#" << deadlinetime << "$#" << type << "$#" << message << "$#" << imp_lvl << '\n';
             temp = temp->next;
         }
-        file.close(); // Close the file after writing
+        file.close();
     }
-    /* else
-    {
-        cout << "Unable to open file for writing." << endl;
-    } */
 }
 
 // function to retrieve data from file
@@ -347,10 +347,6 @@ void loadDataFromFile()
         }
         file.close();
     }
-    /*  else
-     {
-         cout << "No existing data file found. Starting with an empty task list." << endl;
-     } */
 }
 
 // funcction to erase all the tasks from the file
@@ -372,146 +368,126 @@ void eraseFileContents(const string &filename)
 
 bool comparetime12hr(Node *current, ll chour, ll cminute, ll csecond, ll cdate, ll cmonth, ll cyear)
 {
-    int day, month, year, hour, second, minute;
-    extractDateComponents(current->time, day, month, year);
-    extractTimeComponents(current->time1, hour, minute, second);
-    // Comparing year
-    if (cyear < year)
-        return 1;
-    else if (cyear > year)
-        return 0;
+    int taskYear, taskMonth, taskDate, taskHour, taskMinute, taskSecond;
+    extractDateComponents(current->time, taskDate, taskMonth, taskYear);
+    extractTimeComponents(current->time1, taskHour, taskMinute, taskSecond);
 
-    // Compareng month
-    if (cmonth < month)
-        return 1;
-    else if (cmonth > month)
-        return 0;
+    /* cout << taskYear << " " << taskMonth << " " << taskDate << " " << taskHour << " " << taskMinute << " " << taskSecond << endl; */ //For testing
 
-    // Comparing day
-    if (cdate < day)
-        return 1;
-    else if (cdate > day)
-        return 0;
+    // Compare year
+    if (taskYear < cyear)
+        return false;
+    else if (taskYear > cyear)
+        return true;
 
-    if (cdate == day && cmonth == month && cyear == year)
-    {
-        if (chour < hour)
-            return 1;
-        else if (chour > hour)
-            return 0;
+    // Compare month
+    if (taskMonth < cmonth)
+        return false;
+    else if (taskMonth > cmonth)
+        return true;
 
-        // Compareng month
-        if (cminute < minute)
-            return 1;
-        else if (cminute > minute)
-            return 0;
+    // Compare day
+    if (taskDate < cdate)
+        return false;
+    else if (taskDate > cdate)
+        return true;
 
-        // Comparing day
-        if (csecond <= second)
-            return 1;
-        else if (csecond > second)
-            return 0;
-    }
-    return 0;
+    // Compare hours
+    if (taskHour < chour)
+        return false;
+    else if (taskHour > chour)
+        return true;
+
+    // Compare minutes
+    if (taskMinute < cminute)
+        return false;
+    else if (taskMinute > cminute)
+        return true;
+
+    // Compare seconds
+    if (taskSecond < csecond)
+        return false;
+
+    // Default: If all components are equal, return true
+    return true;
 }
-/* void reminder12hr()
-{
-    time_t t = time(0);
-    tm *ti = localtime(&t);
-    ll chour = ti->tm_hour + 12; // chour=current hour. Adding 12 to rempove the tasks which are going to be displayed as reminder
-    ll cminute = ti->tm_min;
-    ll csecond = ti->tm_sec;
-    ll cdate = ti->tm_mday;
-    ll cmonth = ti->tm_mon;
-    ll cyear = ti->tm_year;
-    Node *temp = head_common;
-    while (temp->next != NULL && !comparetime12hr(temp, chour, cminute, csecond, cdate, cmonth, cyear))
-    {
-        cout << "Type: " << temp->type << endl;
-        cout << "Deadline Date: " << temp->time << endl;
-        cout << "Deadline time: " << temp->time1 << endl;
-        cout << "Message: " << temp->message << endl;
-        cout << "Importance level: " << temp->imp_lvl << endl;
-        temp = temp->next;
-        cout << endl;
-        temp = temp->next;
-    }
-} */
 
-/* void reminder12hr()
-{
-    time_t currentTime = time(0);
-    tm *currentDateTime = localtime(&currentTime);
-
-    // Calculate current time in seconds
-    long currentSeconds = currentDateTime->tm_hour * 3600 + currentDateTime->tm_min * 60 + currentDateTime->tm_sec;
-    Node *temp = head_common->next;
-    while (temp != NULL)
-    {
-        tm deadlineTime = {};
-        sscanf(temp->time.c_str(), "%02d%02d%02d", &deadlineTime.tm_mday, &deadlineTime.tm_mon, &deadlineTime.tm_year);
-        sscanf(temp->time1.c_str(), "%02d%02d%02d", &deadlineTime.tm_hour, &deadlineTime.tm_min, &deadlineTime.tm_sec);
-        deadlineTime.tm_mon -= 1;
-        time_t deadline = mktime(&deadlineTime);
-        long timeDifference = difftime(deadline, currentTime);
-        if (timeDifference > 0 && timeDifference < 43200)
-        {
-            cout << "Type: " << temp->type << endl;
-            cout << "Deadline Date: " << temp->time << endl;
-            cout << "Deadline Time: " << temp->time1 << endl;
-            cout << "Message: " << temp->message << endl;
-            cout << "Importance Level: " << temp->imp_lvl << endl;
-            cout << endl;
-        }
-        temp = temp->next;
-    }
-} */
 
 void reminder12hr()
 {
     time_t currentTime = time(0);
-    tm *currentDateTime = localtime(&currentTime);
-    currentDateTime->tm_hour += 12;
-    time_t adjustedTime = mktime(currentDateTime);
-    Node *temp = head_common->next;
-    while (temp != nullptr)
-    {
-        int day, month, year, hour, minute, second;
-        sscanf(temp->time.c_str(), "%2d%2d%2d", &day, &month, &year);
-        sscanf(temp->time1.c_str(), "%2d%2d%2d", &hour, &minute, &second);
+    tm *ct = localtime(&currentTime); // ct= stores currenttime
 
-        month -= 1;// because the ctime gives month from 0-11
-        tm deadlineTime = {0};
-        deadlineTime.tm_mday = day;
-        deadlineTime.tm_mon = month;
-        deadlineTime.tm_year = year + 100;
-        deadlineTime.tm_hour = hour;
-        deadlineTime.tm_min = minute;
-        deadlineTime.tm_sec = second;
-        time_t deadline = mktime(&deadlineTime);
-        if (deadline < adjustedTime)
-        {
-            deadlineTime = *localtime(&deadline);
-            deadlineTime.tm_mday += 1; 
-            deadline = mktime(&deadlineTime);
-        }
-        if (deadline < adjustedTime)
-        {
-            cout << "Type: " << temp->type << endl;
-            cout << "Deadline Date: " << temp->time << endl;
-            cout << "Deadline Time: " << temp->time1 << endl;
-            cout << "Message: " << temp->message << endl;
-            cout << "Importance Level: " << temp->imp_lvl << endl;
-            cout << endl;
-        }
-        else
-        {
-            break;
-        }
+    ll year = ct->tm_year + 1900, month = ct->tm_mon + 1, date = ct->tm_mday, hour = ct->tm_hour, minute = ct->tm_min, second = ct->tm_sec;
+    /* cout << year << " " << month << " " << date << " " << hour << " " << minute << " " << second << endl; */ // For testing
+    hour += 12;
+    ll excess_hour = 0;
+    if (hour >= 24)
+    {
+        excess_hour = hour - 24;
+        hour -= 24;
+    }
+    if (excess_hour)
+        date += 1;
+    ll excess_month = 0;
+    if (date > 31)
+    {
+        date -= 31;
+        excess_month = 1;
+    }
+    if (excess_month)
+        month += 1;
+    ll excess_year = 0;
+    if (month > 12)
+    {
+        month -= 12;
+        excess_year = 1;
+    }
+    if (excess_year)
+        year++;
+   /*  cout << year << " " << month << " " << date << " " << hour << " " << minute << " " << second << endl; */
+    Node *temp = head_common;
+    while (temp->next != NULL && !comparetime12hr(temp->next, hour, minute, second, date, month, year))
+    {
+        cout<<red<<"Reminder for-->"<<endl;
+        cout << "\033[0m"; 
         temp = temp->next;
+        cout << "Type: " << temp->type << endl;
+        cout << "Deadline Date: " << temp->time << endl;
+        cout << "Deadline Time: " << temp->time1 << endl;
+        cout << "Message: " << temp->message << endl;
+        cout << "Importance Level: " << temp->imp_lvl << endl;
+        cout << endl;
     }
 }
 
+void remove_tasks()
+{
+    Node *temp = head_common;
+    cout << "Enter the task number to be removed" << endl;
+    ll k;
+    cin >> k;
+    ll cnt = 0;
+    while (temp->next != NULL && cnt < k)
+    {
+        temp = temp->next;
+        ++cnt;
+    }
+    if (cnt < k || k == 0)
+    {
+        cout << "Enter a valid task number to be removed" << endl;
+    }
+    else
+    {
+        Node *p = temp->prev;
+        p->next = temp->next;
+        if (temp->next != nullptr)
+            temp->next->prev = p;
+        delete temp;
+        cout << "Task removed ." << endl;
+        writeDataToFile();
+    }
+}
 
 int main()
 {
@@ -524,7 +500,8 @@ int main()
         cout << "Enter 1 to insert a task." << endl;
         cout << "Enter 2 to view the whole list of task." << endl;
         cout << "Enter 3 to remove all the previous tasks" << endl;
-        cout << "Enter 4 to exit." << endl;
+        cout << "Enter 4 to remove a task" << endl;
+        cout << "Enter 5 to exit." << endl;
         ll y;
         cin >> y;
         switch (y)
@@ -546,6 +523,11 @@ int main()
             break;
         }
         case 4:
+        {
+            remove_tasks();
+            break;
+        }
+        case 5:
         {
             writeDataToFile();
             goto end;
