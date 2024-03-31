@@ -1,9 +1,3 @@
-// tasks to be done:
-/*
-1) Modify the priorityfunction to compare hours and minutes and seconds as well
-2) Right now the work of how to get the address of the header node of  particular type is remaining. Once it is figured out , all we need to do is to traverse through the list and insert the node at the particular location as per the deadline
-*/
-
 #include <iostream>
 #include <sstream>
 #include <set>
@@ -15,8 +9,8 @@
 #define ll long long
 using namespace std;
 
-char yellow[]={0x1b,'[','0',';','3', '3', 'm',0};//for text coloring
-char red[]={0x1b,'[','0',';','3','1','m',0};//for text coloring
+char yellow[] = {0x1b, '[', '0', ';', '3', '3', 'm', 0}; // for text coloring
+char red[] = {0x1b, '[', '0', ';', '3', '1', 'm', 0};    // for text coloring
 
 // This set will store the type of the tasks already stored
 set<string> type_task;
@@ -90,8 +84,9 @@ public:
     friend void writeDataToFile();
     friend void eraseFileContents(const string &);
     friend bool comparetime12hr(Node *current, ll chour, ll cminute, ll csecond, ll cdate, ll cmonth, ll cyear);
-    friend void reminder12hr();
+    friend void reminder_x_hr(ll);
     friend void remove_tasks();
+    friend void alaram();
 };
 
 Node *head_common = new Node("Common task list");
@@ -253,8 +248,8 @@ void print_common_list()
         cout << endl;
         while (temp != NULL)
         {
-            cout <<yellow<< "TASK: " << cnt++ << endl;
-            cout << "\033[0m"; 
+            cout << yellow << "TASK: " << cnt++ << endl;
+            cout << "\033[0m";
             cout << "Type: " << temp->type << endl;
             cout << "Deadline Date: " << temp->time << endl;
             cout << "Deadline time: " << temp->time1 << endl;
@@ -372,7 +367,7 @@ bool comparetime12hr(Node *current, ll chour, ll cminute, ll csecond, ll cdate, 
     extractDateComponents(current->time, taskDate, taskMonth, taskYear);
     extractTimeComponents(current->time1, taskHour, taskMinute, taskSecond);
 
-    /* cout << taskYear << " " << taskMonth << " " << taskDate << " " << taskHour << " " << taskMinute << " " << taskSecond << endl; */ //For testing
+    /* cout << taskYear << " " << taskMonth << " " << taskDate << " " << taskHour << " " << taskMinute << " " << taskSecond << endl; */ // For testing
 
     // Compare year
     if (taskYear < cyear)
@@ -412,15 +407,57 @@ bool comparetime12hr(Node *current, ll chour, ll cminute, ll csecond, ll cdate, 
     return true;
 }
 
+bool checkdate(ll month,ll *date,ll year)
+{
+    if(month==1||month==3||month==5||month==7||month==8|month==10||month==12)
+    {
+        if(*date>31)
+        {
+            *date=1;
+            return 1;
+        }
+        return 0;
+    }
+    else if(month==4||month==6||month==9||month==11)
+    {
+        if(*date>30)
+        {
+            *date=1;
+            return 1;
+        }
+        return 0;
+    }
+    else
+    {
+        if ((year % 4 == 0 && year % 100 != 0) || (year % 400 == 0))
+        {
+            if(*date>28)
+            {
+                *date=1;
+                return 1;   
+            }
+            return 0;
+        }
+        else
+        {
+            if(*date>29)
+            {
+                *date=1;
+                return 1;   
+            }
+            return 0;
+        }
+    }
+}
 
-void reminder12hr()
+void reminder_x_hr(ll rhour)
 {
     time_t currentTime = time(0);
     tm *ct = localtime(&currentTime); // ct= stores currenttime
 
     ll year = ct->tm_year + 1900, month = ct->tm_mon + 1, date = ct->tm_mday, hour = ct->tm_hour, minute = ct->tm_min, second = ct->tm_sec;
     /* cout << year << " " << month << " " << date << " " << hour << " " << minute << " " << second << endl; */ // For testing
-    hour += 12;
+    hour += rhour;
     ll excess_hour = 0;
     if (hour >= 24)
     {
@@ -430,9 +467,8 @@ void reminder12hr()
     if (excess_hour)
         date += 1;
     ll excess_month = 0;
-    if (date > 31)
+    if (checkdate(month,&date,year))
     {
-        date -= 31;
         excess_month = 1;
     }
     if (excess_month)
@@ -445,12 +481,12 @@ void reminder12hr()
     }
     if (excess_year)
         year++;
-   /*  cout << year << " " << month << " " << date << " " << hour << " " << minute << " " << second << endl; */
+    /*  cout << year << " " << month << " " << date << " " << hour << " " << minute << " " << second << endl; */
     Node *temp = head_common;
     while (temp->next != NULL && !comparetime12hr(temp->next, hour, minute, second, date, month, year))
     {
-        cout<<red<<"Reminder for-->"<<endl;
-        cout << "\033[0m"; 
+        cout << red << "Reminder for-->" << endl;
+        cout << "\033[0m";
         temp = temp->next;
         cout << "Type: " << temp->type << endl;
         cout << "Deadline Date: " << temp->time << endl;
@@ -489,10 +525,72 @@ void remove_tasks()
     }
 }
 
+void alaram()
+{
+    time_t currentTime = time(0);
+    tm *ct = localtime(&currentTime); // ct= stores currenttime
+
+    ll cnt = 0;
+
+    ll year = ct->tm_year + 1900, month = ct->tm_mon + 1, date = ct->tm_mday, hour = ct->tm_hour, minute = ct->tm_min, second = ct->tm_sec;
+    /* cout << year << " " << month << " " << date << " " << hour << " " << minute << " " << second << endl; */ // For testing
+    hour += 0;
+    ll excess_hour = 0;
+    if (hour >= 24)
+    {
+        excess_hour = hour - 24;
+        hour -= 24;
+    }
+    if (excess_hour)
+        date += 1;
+    ll excess_month = 0;
+    if (checkdate(month,&date,year))
+    {
+        excess_month = 1;
+    }
+    if (excess_month)
+        month += 1;
+    ll excess_year = 0;
+    if (month > 12)
+    {
+        month -= 12;
+        excess_year = 1;
+    }
+    if (excess_year)
+        year++;
+    /*  cout << year << " " << month << " " << date << " " << hour << " " << minute << " " << second << endl; */
+    Node *temp = head_common;
+    if(head_common->next==NULL)
+    return ;
+    temp=temp->next;
+    while (temp != NULL && !comparetime12hr(temp, hour, minute, second, date, month, year))
+    {
+        cnt = 1;//This condition is very important as it updates the next of the head_common
+        cout << yellow << "ALARAM FOR:-->" << endl;
+        cout << "\033[0m";
+        cout << "Type: " << temp->type << endl;
+        cout << "Deadline Date: " << temp->time << endl;
+        cout << "Deadline Time: " << temp->time1 << endl;
+        cout << "Message: " << temp->message << endl;
+        cout << "Importance Level: " << temp->imp_lvl << endl;
+        cout << endl;
+        temp=temp->next;
+    }
+    if (cnt == 1)
+    {
+        head_common->next = temp;
+        cout << red << "completed tasks are removed" << endl;
+        cout << "\033[0m"<<endl;;
+    }
+    writeDataToFile();
+}
+
+
 int main()
 {
     loadDataFromFile();
-    reminder12hr();
+    alaram();//function to remove tasks whose deadline is over
+    reminder_x_hr(12);
     ll x = 1;
     while (1)
     {
