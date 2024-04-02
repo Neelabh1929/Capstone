@@ -42,8 +42,8 @@ public:
 
     Node(string t, string t1, string type1, string message1)
     {
-        time = t;
-        time1 = t1;
+        time = t;   // this is to store the deadline date
+        time1 = t1; // this is to store the deadline time
         type = type1;
         message = message1;
         // imp_lvl=0 is considered as the most common task
@@ -77,16 +77,23 @@ public:
         next = NULL;
         prev = NULL;
     }
+
+    // All the friend functions
     friend void insert_task_common(string, string, string, string, ll);
     friend void createlist();
     friend int priority(Node *, Node *);
-    friend void print_common_list();
+    friend void print_common_list(Node*head_common);
     friend void writeDataToFile();
     friend void eraseFileContents(const string &);
-    friend bool comparetime12hr(Node *current, ll chour, ll cminute, ll csecond, ll cdate, ll cmonth, ll cyear);
+    friend bool cmoparet2ime(Node *current, ll chour, ll cminute, ll csecond, ll cdate, ll cmonth, ll cyear);
     friend void reminder_x_hr(ll);
     friend void remove_tasks();
-    friend void alaram();
+    friend void alaram(Node*);
+    friend bool is_list_empty();
+    friend void reschedule();
+    friend void edit_task();
+    friend void daily_task();
+    friend void insert_task_daily();
 };
 
 Node *head_common = new Node("Common task list");
@@ -210,6 +217,54 @@ void insert_task_common(string deadlinedate, string deadlinetime, string type_by
     temp->next = temp_insert;
 }
 
+bool compare_time_ctime_user_time(string user_date, string user_time)
+// This function to check valid deadline input from user
+{
+    int year, month, date, hour, minute, seconds;
+    extractDateComponents(user_date, date, month, year);
+    extractTimeComponents(user_time, hour, minute, seconds);
+    time_t currentTime = time(0);
+    tm *ct = localtime(&currentTime); // ct= stores currenttime
+
+    ll cyear = ct->tm_year + 1900, cmonth = ct->tm_mon + 1, cdate = ct->tm_mday, chour = ct->tm_hour, cminute = ct->tm_min, csecond = ct->tm_sec;
+    // Compare year
+    if (year < cyear)
+        return false;
+    else if (year > cyear)
+        return true;
+
+    // Compare month
+    if (month < cmonth)
+        return false;
+    else if (month > cmonth)
+        return true;
+
+    // Compare day
+    if (date < cdate)
+        return false;
+    else if (date > cdate)
+        return true;
+
+    // Compare hours
+    if (hour < chour)
+        return false;
+    else if (hour > chour)
+        return true;
+
+    // Compare minutes
+    if (minute < cminute)
+        return false;
+    else if (minute > cminute)
+        return true;
+
+    // Compare seconds
+    if (seconds < csecond)
+        return false;
+
+    // Default: If all components are equal, return true
+    return true;
+}
+
 void insert_task()
 {
     cout << "Enter the type of task:" << endl;
@@ -220,14 +275,50 @@ void insert_task()
     cout << "Enter the Integral Importance level of this task:" << endl;
     ll imp_lvl_user;
     cin >> imp_lvl_user;
-
-    string deadlinedate, deadlinetime, message;
-    cout << "Enter the Deadline date of the task:" << endl;
     cin.ignore(); // to ignore the newline character from the buffer
+    string deadlinedate, deadlinetime, message;
+
+again: // Brings here when deadline entered is already expired
+
+    cout << "Enter the Deadline date of the task(FORMAT = DDMMYYYY):" << endl;
     getline(cin, deadlinedate);
-    cout << "Enter the Deadline time of the task:" << endl;
+
+    // This passage of code is for taking valid input of deadline DATE
+    if (deadlinedate.size() != 8)
+    {
+        cout << "Please Enter valid date in correct format" << endl;
+    }
+    while (deadlinedate.size() != 8)
+    {
+        getline(cin, deadlinedate);
+        if (deadlinedate.size() != 8)
+        {
+            cout << "Please Enter valid date in correct format" << endl;
+        }
+    }
+
+    cout << "Enter the Deadline time of the task(FORMAT = HHMMSS):" << endl;
     getline(cin, deadlinetime);
 
+    // This passage of code is for taking valid input of deadline DATE
+    if (deadlinetime.size() != 6)
+    {
+        cout << "Please Enter valid time in correct format" << endl;
+    }
+    while (deadlinetime.size() != 6)
+    {
+        getline(cin, deadlinetime);
+        if (deadlinetime.size() != 6)
+        {
+            cout << "Please Enter valid time in correct format" << endl;
+        }
+    }
+
+    if (!compare_time_ctime_user_time(deadlinedate, deadlinetime)) // if deadline is already expired
+    {
+        cout << "Deadline already expired. Please Enter correct deadline" << endl;
+        goto again;
+    }
     cout << "Enter the message you want with the remainder:" << endl;
     getline(cin, message);
 
@@ -239,12 +330,12 @@ void insert_task()
     insert_task_common(deadlinedate, deadlinetime, task_type_user, message, imp_lvl_user);
 }
 
-void print_common_list()
+void print_common_list(Node*head)
 {
     ll cnt = 1;
-    if (head_common->next != NULL)
+    if (head->next != NULL)
     {
-        Node *temp = head_common->next;
+        Node *temp = head->next;
         cout << endl;
         while (temp != NULL)
         {
@@ -361,7 +452,7 @@ void eraseFileContents(const string &filename)
     }
 }
 
-bool comparetime12hr(Node *current, ll chour, ll cminute, ll csecond, ll cdate, ll cmonth, ll cyear)
+bool cmoparet2ime(Node *current, ll chour, ll cminute, ll csecond, ll cdate, ll cmonth, ll cyear)
 {
     int taskYear, taskMonth, taskDate, taskHour, taskMinute, taskSecond;
     extractDateComponents(current->time, taskDate, taskMonth, taskYear);
@@ -407,22 +498,22 @@ bool comparetime12hr(Node *current, ll chour, ll cminute, ll csecond, ll cdate, 
     return true;
 }
 
-bool checkdate(ll month,ll *date,ll year)
+bool checkdate(ll month, ll *date, ll year)
 {
-    if(month==1||month==3||month==5||month==7||month==8|month==10||month==12)
+    if (month == 1 || month == 3 || month == 5 || month == 7 || month == 8 | month == 10 || month == 12)
     {
-        if(*date>31)
+        if (*date > 31)
         {
-            *date=1;
+            *date = 1;
             return 1;
         }
         return 0;
     }
-    else if(month==4||month==6||month==9||month==11)
+    else if (month == 4 || month == 6 || month == 9 || month == 11)
     {
-        if(*date>30)
+        if (*date > 30)
         {
-            *date=1;
+            *date = 1;
             return 1;
         }
         return 0;
@@ -431,23 +522,33 @@ bool checkdate(ll month,ll *date,ll year)
     {
         if ((year % 4 == 0 && year % 100 != 0) || (year % 400 == 0))
         {
-            if(*date>28)
+            if (*date > 28)
             {
-                *date=1;
-                return 1;   
+                *date = 1;
+                return 1;
             }
             return 0;
         }
         else
         {
-            if(*date>29)
+            if (*date > 29)
             {
-                *date=1;
-                return 1;   
+                *date = 1;
+                return 1;
             }
             return 0;
         }
     }
+}
+
+bool is_list_empty()
+// This function is to check wether the list is empty or not
+{
+    if (head_common->next == NULL)
+    {
+        return 1;
+    }
+    return 0;
 }
 
 void reminder_x_hr(ll rhour)
@@ -467,7 +568,7 @@ void reminder_x_hr(ll rhour)
     if (excess_hour)
         date += 1;
     ll excess_month = 0;
-    if (checkdate(month,&date,year))
+    if (checkdate(month, &date, year))
     {
         excess_month = 1;
     }
@@ -483,7 +584,7 @@ void reminder_x_hr(ll rhour)
         year++;
     /*  cout << year << " " << month << " " << date << " " << hour << " " << minute << " " << second << endl; */
     Node *temp = head_common;
-    while (temp->next != NULL && !comparetime12hr(temp->next, hour, minute, second, date, month, year))
+    while (temp->next != NULL && !cmoparet2ime(temp->next, hour, minute, second, date, month, year))
     {
         cout << red << "Reminder for-->" << endl;
         cout << "\033[0m";
@@ -500,6 +601,11 @@ void reminder_x_hr(ll rhour)
 void remove_tasks()
 {
     Node *temp = head_common;
+    if (is_list_empty())
+    {
+        cout << "There is no task int the list." << endl;
+        return;
+    }
     cout << "Enter the task number to be removed" << endl;
     ll k;
     cin >> k;
@@ -509,23 +615,21 @@ void remove_tasks()
         temp = temp->next;
         ++cnt;
     }
-    if (cnt < k || k == 0)
+    while (cnt < k || k == 0)
     {
         cout << "Enter a valid task number to be removed" << endl;
+        cin >> k;
     }
-    else
-    {
-        Node *p = temp->prev;
-        p->next = temp->next;
-        if (temp->next != nullptr)
-            temp->next->prev = p;
-        delete temp;
-        cout << "Task removed ." << endl;
-        writeDataToFile();
-    }
+    Node *p = temp->prev;
+    p->next = temp->next;
+    if (temp->next != nullptr)
+        temp->next->prev = p;
+    delete temp;
+    cout << "Task removed ." << endl;
+    writeDataToFile();
 }
 
-void alaram()
+void alaram(Node* head)
 {
     time_t currentTime = time(0);
     tm *ct = localtime(&currentTime); // ct= stores currenttime
@@ -544,7 +648,7 @@ void alaram()
     if (excess_hour)
         date += 1;
     ll excess_month = 0;
-    if (checkdate(month,&date,year))
+    if (checkdate(month, &date, year))
     {
         excess_month = 1;
     }
@@ -558,14 +662,16 @@ void alaram()
     }
     if (excess_year)
         year++;
+    
     /*  cout << year << " " << month << " " << date << " " << hour << " " << minute << " " << second << endl; */
-    Node *temp = head_common;
-    if(head_common->next==NULL)
-    return ;
-    temp=temp->next;
-    while (temp != NULL && !comparetime12hr(temp, hour, minute, second, date, month, year))
+
+    Node *temp = head;
+    if (head->next == NULL)
+        return;
+    temp = temp->next;
+    while (temp != NULL && !cmoparet2ime(temp, hour, minute, second, date, month, year))
     {
-        cnt = 1;//This condition is very important as it updates the next of the head_common
+        cnt = 1; // This condition is very important as it updates the next of the head_common
         cout << yellow << "ALARAM FOR:-->" << endl;
         cout << "\033[0m";
         cout << "Type: " << temp->type << endl;
@@ -574,22 +680,157 @@ void alaram()
         cout << "Message: " << temp->message << endl;
         cout << "Importance Level: " << temp->imp_lvl << endl;
         cout << endl;
-        temp=temp->next;
+        temp = temp->next;
     }
     if (cnt == 1)
     {
-        head_common->next = temp;
+        head->next = temp;
         cout << red << "completed tasks are removed" << endl;
-        cout << "\033[0m"<<endl;;
+        cout << "\033[0m" << endl;
     }
     writeDataToFile();
 }
 
+void reschedule()
+{
+    Node *temp = head_common;
+    if (is_list_empty())
+    {
+        cout << "There is no task int the list." << endl;
+        return;
+    }
+    cout << "Enter the task number to be rescheduled" << endl;
+    ll k;
+    cin >> k;
+    ll cnt = 0;
+    while (temp->next != NULL && cnt < k)
+    {
+        temp = temp->next;
+        ++cnt;
+    }
+    while (cnt < k || k == 0)
+    {
+        cout << "Enter a valid task number to be rescheduled" << endl;
+        cin.ignore(numeric_limits<streamsize>::max(), '\n');
+        cin >> k;
+    }
+    string deadlinedate, deadlinetime, message;
 
+again: // Brings here when deadline entered is already expired
+
+    cout << "Enter the New Deadline date of the task(FORMAT = DDMMYYYY):" << endl;
+    cin.ignore(numeric_limits<streamsize>::max(), '\n');
+    getline(cin, deadlinedate);
+
+    // This passage of code is for taking valid input of deadline DATE
+    if (deadlinedate.size() != 8)
+    {
+        cout << "Please Enter valid date in correct format" << endl;
+    }
+    while (deadlinedate.size() != 8)
+    {
+        cin.ignore(numeric_limits<streamsize>::max(), '\n');
+        getline(cin, deadlinedate);
+        if (deadlinedate.size() != 8)
+        {
+            cout << "Please Enter valid date in correct format" << endl;
+        }
+    }
+    cout << "Enter the New Deadline time of the task(FORMAT = HHMMSS):" << endl;
+    getline(cin, deadlinetime);
+
+    // This passage of code is for taking valid input of deadline DATE
+    if (deadlinetime.size() != 6)
+    {
+        cout << "Please Enter valid time in correct format" << endl;
+    }
+    while (deadlinetime.size() != 6)
+    {
+        getline(cin, deadlinetime);
+        if (deadlinetime.size() != 6)
+        {
+            cout << "Please Enter valid time in correct format" << endl;
+        }
+    }
+
+    if (!compare_time_ctime_user_time(deadlinedate, deadlinetime)) // if deadline is already expired
+    {
+        cout << "Deadline already expired. Please Enter correct deadline" << endl;
+        goto again;
+    }
+
+    temp->time = deadlinedate;
+    temp->time1 = deadlinetime;
+    writeDataToFile();
+}
+
+void edit_task()
+{
+    cout << "Enter the task number which you want to edit" << endl;
+    ll k;
+    Node *temp = head_common;
+    if (is_list_empty())
+    {
+        cout << "There is no task in the list." << endl;
+        return;
+    }
+    cin >> k;
+    ll cnt = 0;
+    while (temp->next != NULL && cnt < k)
+    {
+        temp = temp->next;
+        ++cnt;
+    }
+    while (cnt < k || k == 0)
+    {
+        cout << "Enter a valid task number(Either you entered 0 or there are less task then your number)" << endl;
+        cin.ignore(numeric_limits<streamsize>::max(), '\n');
+        cin >> k;
+    }
+    ll counter;
+    cout << "Enter 1 to edit task type" << endl;
+    cout << "Enter 2 to edit task importance level" << endl;
+    cout << "Enter 3 to edit task message" << endl;
+    cin >> counter; // token which tells what to edit
+    switch (counter)
+    {
+    case 1:
+    {
+        cout << "Enter the new type of task:" << endl;
+        string task_type_user;
+        cin.ignore(numeric_limits<streamsize>::max(), '\n'); // igonres newline char
+        getline(cin, task_type_user);
+        temp->type = task_type_user;
+        type_task.insert(task_type_user);
+        writeDataToFile();
+        break;
+    }
+    case 2:
+    {
+        cout << "Enter the new importance level:" << endl;
+        ll task_imp_lvl;
+        cin.ignore(numeric_limits<streamsize>::max(), '\n'); // igonres newline char
+        cin >> task_imp_lvl;
+        temp->imp_lvl = task_imp_lvl;
+        writeDataToFile();
+        break;
+    }
+    case 3:
+    {
+        cout << "Enter the new message:" << endl;
+        string task_message;
+        cin.ignore(numeric_limits<streamsize>::max(), '\n'); // igonres newline char
+        getline(cin, task_message);
+        temp->message = task_message;
+        writeDataToFile();
+        break;
+    }
+    }
+}
 int main()
 {
     loadDataFromFile();
-    alaram();//function to remove tasks whose deadline is over
+    alaram(head_common); // function to remove tasks whose deadline is over
     reminder_x_hr(12);
     ll x = 1;
     while (1)
@@ -599,7 +840,10 @@ int main()
         cout << "Enter 2 to view the whole list of task." << endl;
         cout << "Enter 3 to remove all the previous tasks" << endl;
         cout << "Enter 4 to remove a task" << endl;
-        cout << "Enter 5 to exit." << endl;
+        cout << "Enter 5 to reschedule a task" << endl;
+        cout << "Enter 6 to edit any task" << endl;
+        cout << "Enter 7 to insert a task as the daily task" << endl;
+        cout << "Enter 8 to exit." << endl;
         ll y;
         cin >> y;
         switch (y)
@@ -612,7 +856,7 @@ int main()
         }
         case 2:
         {
-            print_common_list();
+            print_common_list(head_common);
             break;
         }
         case 3:
@@ -626,6 +870,21 @@ int main()
             break;
         }
         case 5:
+        {
+            reschedule();
+            break;
+        }
+        case 6:
+        {
+            edit_task();
+            break;
+        }
+        case 7:
+        {
+
+            break;
+        }
+        case 8:
         {
             writeDataToFile();
             goto end;
