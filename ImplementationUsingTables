@@ -314,13 +314,14 @@ class Task
 			}
 			cout<<"Write a brief description of task(50 characters)"<<endl;
 			cin>>task;
+			here:
 			cout<<"Is this task linked to a previous task?"<<endl;
 			cout<<"If yes then enter 1 else enter 0"<<endl;
 			cin>>Linked;
 			if(Linked)
 			{
 				cout<<"Enter the date and time of linked task"<<endl;
-				here:
+			
 				Date D;
 				Time E;
 				if(!Compare(D,A,E,B))
@@ -664,12 +665,44 @@ bool ShowTask()
 		return false;
 }
 
+void deletetask() {
+	Date C;
+	Time D;
+	char g[32];
+	g[0]=0;
+	strcat(g,"C:/Schedule/");
+	strcat(g,C.ShowDateStr());
+	strcat(g,"/");
+	strcat(g,D.ShowTimeStr());
+	strcat(g,".txt");
+    cout<<g<<endl;
+    FILE* f = fopen(g, "r");
+    if (f != NULL) {
+        fclose(f);
+        if (remove(g) != 0) 
+		{
+            cerr << "Error deleting file: " << g<< endl;
+        } 
+		else 
+		{
+            cout << "File successfully deleted: " << g << endl;
+        }
+    } 
+	else 
+	{
+		fclose(f);
+        cerr << "File not found: " << g << endl;
+    }
+}
+
+
+
 void UserInterface()
 {
 	bool repeat=true;
 	while(repeat)
 	{
-		cout<<"Enter (0,1,2) if you want to create a task,show task,stop app"<<endl;
+		cout<<"Enter (0,1,2,3) if you want to create a task,show task,stop app,delete task"<<endl;
 		int a;
 		cin>>a;
 		switch (a)
@@ -683,6 +716,10 @@ void UserInterface()
 			case 2:
 				repeat=false;
 				break;
+			case 3:
+				deletetask();
+				break;
+				
 			default:
 				cout<<"Enter a valid number"<<endl;
 				break;
