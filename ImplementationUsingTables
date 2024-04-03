@@ -455,6 +455,30 @@ void Show(Head* H)
 	tmp=H->Front;
 	if(tmp->P.Linked)
 	{
+		char file[32];
+		file[0]=0;
+		strcat(file,"C:/Schedule/");
+		strcat(file,tmp->P.date);
+		strcat(file,"/");
+		strcat(file,tmp->P.time1);
+		strcat(file,".txt");
+		cout<<file<<endl;
+		FILE *W;
+		char tas[50];
+		int c;
+		bool eS=false;
+		W=fopen(file,"r");
+		
+		fscanf(W,"%d",&c);
+		fscanf(W,"%s",tas);
+		fscanf(W,"%d",&c);
+		fscanf(W,"%s",tas);
+		fscanf(W,"%s",tas);
+		fscanf(W,"%d",&c);
+		fscanf(W,"%d",&c);
+		eS=(bool)c;
+		tmp->P.taskDone=(bool)c;
+		fclose(W);
 		if(tmp->P.taskDone)
 		{
 			cout<<"Your task is : "<<tmp->P.task<<endl;
@@ -573,6 +597,8 @@ bool ShowTask()
 		if(f!=NULL)
 		{
 			//cout<<"File is not empty"<<endl;  
+			FILE* tp;
+			tp=fopen("tmp.txt","a");
 			Head* H;//segmentation fault!
 			H=(Head*)malloc(sizeof(Head));
 			if(H==NULL)
@@ -580,7 +606,7 @@ bool ShowTask()
 				cout<<"No Memory left"<<endl;
 			}
 			int j=0;
-			char t[50],d[9],l[7];
+			char t[50],da[9],l[7];
 			int h=0;
 			bool L,tD,eS;
 			int a,b,c;
@@ -589,27 +615,47 @@ bool ShowTask()
 				fscanf(f,"%s",t);
 				fscanf(f,"%d",&a);
 				L=(bool)a;
-				fscanf(f,"%s",d);
+				fscanf(f,"%s",da);
 				fscanf(f,"%s",l);
 				fscanf(f,"%d",&b);
 				tD=(bool)b;
 				fscanf(f,"%d",&c);
 				eS=(bool)c;
-				Task Q(h,t,L,d,l,tD,eS);
+				Task Q(h,t,L,da,l,tD,eS);
 				Push(Q,H,j);//here is the problem
+				fprintf(tp,"%d %s %d %s %s %d %d\n",h,t,L,da,l,tD,1);
 				j++;
 			}
-			
+			fclose(tp);
+			fclose(f);
+			tp=fopen("tmp.txt","r");
+			f=fopen(d,"w");
 			for(int k=0;k<j;k++)
 			{	
+				fscanf(tp,"%d",&h);
+				fscanf(tp,"%s",t);
+				fscanf(tp,"%d",&a);
+				L=(bool)a;
+				fscanf(tp,"%s",da);
+				fscanf(tp,"%s",l);
+				fscanf(tp,"%d",&b);
+				tD=(bool)b;
+				fscanf(tp,"%d",&c);
+				eS=(bool)c;
+				fprintf(f,"%d %s %d %s %s %d %d\n",h,t,L,da,l,tD,1);
 				Show(H);
 				PopFront(H);
 			}
+			fclose(f);
+			fclose(tp);
+			remove("tmp.txt");
 			free(H);
 			m++;
 		}
-		fclose(f);
-		
+		else
+		{
+			fclose(f);
+		}
 	}
 	
 	if(m!=0)
