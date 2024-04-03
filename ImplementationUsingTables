@@ -29,23 +29,23 @@ class Date
 				cin>>MM;
 				cout<<"Enter Year of Task"<<endl;
 				cin>>YYYY;
-				if(DD==29&&MM==2&&YYYY%4==0)
+				if(DD==29&&MM==2&&YYYY%4==0&&MM<=12)
 				{
 					Correct=true;
 				}
-				else if(DD==31&&(MM==1||MM==3||MM==5||MM==7||MM==8||MM==10||MM==12))
+				else if(DD==31&&(MM==1||MM==3||MM==5||MM==7||MM==8||MM==10||MM==12)&&MM<=12)
 				{
 					Correct=true;
 				}
-				else if(DD==30&&(MM==4||MM==6||MM==9||MM==11)&&MM!=2)
+				else if(DD==30&&(MM==4||MM==6||MM==9||MM==11)&&MM!=2&&MM<=12)
 				{
 					Correct=true;
 				}
-				else if(1<=DD&&DD<=30&&MM!=2)
+				else if(1<=DD&&DD<=30&&MM!=2&&MM<=12)
 				{
 					Correct=true;
 				}
-				else if(1<=DD&&DD<=28&&MM==2)
+				else if(1<=DD&&DD<=28&&MM==2&&MM<=12)
 				{
 					Correct=true;
 				}
