@@ -498,49 +498,98 @@ bool cmoparet2ime(Node *current, ll chour, ll cminute, ll csecond, ll cdate, ll 
     return true;
 }
 
+// bool checkdate(ll month, ll *date, ll year)
+// {
+//     if (month == 1 || month == 3 || month == 5 || month == 7 || month == 8 | month == 10 || month == 12)
+//     {
+//         if (*date > 31)
+//         {
+//             *date = 1;
+//             return 1;
+//         }
+//         return 0;
+//     }
+//     else if (month == 4 || month == 6 || month == 9 || month == 11)
+//     {
+//         if (*date > 30)
+//         {
+//             *date = 1;
+//             return 1;
+//         }
+//         return 0;
+//     }
+//     else
+//     {
+//         if ((year % 4 == 0 && year % 100 != 0) || (year % 400 == 0))
+//         {
+//             if (*date > 28)
+//             {
+//                 *date = 1;
+//                 return 1;
+//             }
+//             return 0;
+//         }
+//         else
+//         {
+//             if (*date > 29)
+//             {
+//                 *date = 1;
+//                 return 1;
+//             }
+//             return 0;
+//         }
+//     }
+// }
+
 bool checkdate(ll month, ll *date, ll year)
 {
-    if (month == 1 || month == 3 || month == 5 || month == 7 || month == 8 | month == 10 || month == 12)
+    // Check for leap year
+    bool isLeapYear = (year % 4 == 0 && (year % 100 != 0 || year % 400 == 0));
+    
+    if (month == 1 || month == 3 || month == 5 || month == 7 || month == 8 || month == 10 || month == 12)
     {
         if (*date > 31)
         {
             *date = 1;
-            return 1;
+            return true; // Date was adjusted
         }
-        return 0;
     }
     else if (month == 4 || month == 6 || month == 9 || month == 11)
     {
         if (*date > 30)
         {
             *date = 1;
-            return 1;
+            return true; // Date was adjusted
         }
-        return 0;
     }
-    else
+    else if (month == 2)
     {
-        if ((year % 4 == 0 && year % 100 != 0) || (year % 400 == 0))
-        {
-            if (*date > 28)
-            {
-                *date = 1;
-                return 1;
-            }
-            return 0;
-        }
-        else
+        if (isLeapYear)
         {
             if (*date > 29)
             {
                 *date = 1;
-                return 1;
+                return true; // Date was adjusted
             }
-            return 0;
+        }
+        else
+        {
+            if (*date > 28)
+            {
+                *date = 1;
+                return true; // Date was adjusted
+            }
         }
     }
-}
+    else
+    {
+        // Month is not validated so
+        *date = 1; 
+        return true; 
+    }
 
+    return false; 
+}
 bool is_list_empty()
 // This function is to check wether the list is empty or not
 {
