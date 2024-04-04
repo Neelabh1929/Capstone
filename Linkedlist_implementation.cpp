@@ -165,12 +165,39 @@ void extractDateComponents(const string &date, int &day, int &month, int &year)
     year = stringToInt(date.substr(4, 4));
     // used substr as it works on only two arguments takes the initial position from where to start and the number of steps thus easy to extract
 }
-void extractTimeComponents(const string &time, int &hours, int &minutes, int &seconds)
-{
+// void extractTimeComponents(const string &time, int &hours, int &minutes, int &seconds)
+// {
+//     hours = stringToInt(time.substr(0, 2));
+//     minutes = stringToInt(time.substr(2, 2));
+//     seconds = stringToInt(time.substr(4, 2));
+// }
+bool extractTimeComponents(const string &time, int &hours, int &minutes, int &seconds) {
     hours = stringToInt(time.substr(0, 2));
     minutes = stringToInt(time.substr(2, 2));
     seconds = stringToInt(time.substr(4, 2));
+
+    //  components are within their respective valid ranges
+    if(hours < 0 || hours > 23 || minutes < 0 || minutes > 59 || seconds < 0 || seconds > 59) {
+        // out of range, return false
+        return false;
+    } 
+    return true;
 }
+    bool validTime = false;
+    while (!validTime) {
+        cout << "Enter the Deadline time of the task(FORMAT = HHMMSS):" << endl;
+        getline(cin, deadlinetime);
+
+        int hours, minutes, seconds;
+        if (deadlinetime.size() != 6) {
+            cout << "Please Enter valid time in correct format" << endl;
+        } else if (!extractTimeComponents(deadlinetime, hours, minutes, seconds)) {
+            // time components are not valid, inform the user and loop back for another input
+            cout << "Time entered is not valid. Please ensure hours are between 00 and 23, minutes and seconds are between 00 and 59." << endl;
+        } else {
+            validTime = true; 
+        }
+    }
 
 // defination of the priority function
 int priority(Node *temp, Node *temp_insert)
