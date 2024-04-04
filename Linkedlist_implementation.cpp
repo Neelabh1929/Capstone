@@ -1,5 +1,4 @@
 #include <iostream>
-#include<limits>
 #include <sstream>
 #include <set>
 #include <vector>
@@ -50,14 +49,13 @@ public:
     friend void display_daily();
     friend void display_incomplete_dailytask();
     friend void delete_daily_task();
-    friend void write_daily_task();
-    friend void load_daily_task_file();
-    friend void erase_all_daily_task();
+    friend void write_daily_task(string);
+    friend void load_daily_task_file(string);
+    friend void erase_all_daily_task(string);
     friend void insert_daily(string deadlinetime, string type, string message, ll imp_lvl);
 };
 
 Node_daily *head_daily = new Node_daily("Daily Task");
-
 class Node
 {
     string time, time1, type, message;
@@ -123,15 +121,15 @@ public:
     friend void createlist();
     friend int priority(Node *, Node *);
     friend void print_common_list(Node *head_common);
-    friend void writeDataToFile();
+    friend void writeDataToFile(string);
     friend void eraseFileContents(const string &);
     friend bool cmoparet2ime(Node *current, ll chour, ll cminute, ll csecond, ll cdate, ll cmonth, ll cyear);
     friend void reminder_x_hr(ll);
-    friend void remove_tasks();
-    friend void alaram(Node *);
+    friend void remove_tasks(string);
+    friend void alaram(Node *, string);
     friend bool is_list_empty();
-    friend void reschedule();
-    friend void edit_task();
+    friend void reschedule(string);
+    friend void edit_task(string);
     friend void daily_task();
     friend void insert_task_daily();
 };
@@ -400,9 +398,10 @@ void print_common_list(Node *head)
 }
 
 // function to write data to the file
-void writeDataToFile()
+void writeDataToFile(string username)
 {
-    ofstream file("task_data.txt"); // Open the file named "task_data.txt" for writing
+    string fle = username + "task_data";
+    ofstream file(fle); // Open the file named "task_data.txt" for writing
     if (file.is_open())
     {
         Node *temp = head_common->next;
@@ -440,9 +439,10 @@ void writeDataToFile()
 }
 
 // function to retrieve data from file
-void loadDataFromFile()
+void loadDataFromFile(string username)
 {
-    ifstream file("task_data.txt");
+    string fle = username + "task_data";
+    ifstream file(fle);
     if (file.is_open())
     {
         string line;
@@ -626,9 +626,8 @@ void reminder_x_hr(ll rhour)
     Node *temp = head_common;
     while (temp->next != NULL && !cmoparet2ime(temp->next, hour, minute, second, date, month, year))
     {
-        cout<<endl;
         cout << red << "Reminder for-->" << endl;
-        cout << "\033[0m"<<endl;
+        cout << "\033[0m";
         temp = temp->next;
         cout << "Type: " << temp->type << endl;
         cout << "Deadline Date: " << temp->time << endl;
@@ -639,12 +638,12 @@ void reminder_x_hr(ll rhour)
     }
 }
 
-void remove_tasks()
+void remove_tasks(string username)
 {
     Node *temp = head_common;
     if (is_list_empty())
     {
-        cout << "There is no task int the list." << endl;
+        cout << "There is no task in the list." << endl;
         return;
     }
     cout << "Enter the task number to be removed" << endl;
@@ -663,14 +662,14 @@ void remove_tasks()
     }
     Node *p = temp->prev;
     p->next = temp->next;
-    if (temp->next != nullptr)
+    if (temp->next != NULL)
         temp->next->prev = p;
     delete temp;
     cout << "Task removed ." << endl;
-    writeDataToFile();
+    writeDataToFile(username);
 }
 
-void alaram(Node *head)
+void alaram(Node *head, string username)
 {
     time_t currentTime = time(0);
     tm *ct = localtime(&currentTime); // ct= stores currenttime
@@ -729,10 +728,10 @@ void alaram(Node *head)
         cout << red << "completed tasks are removed" << endl;
         cout << "\033[0m" << endl;
     }
-    writeDataToFile();
+    writeDataToFile(username);
 }
 
-void reschedule()
+void reschedule(string username)
 {
     Node *temp = head_common;
     if (is_list_empty())
@@ -802,10 +801,10 @@ again: // Brings here when deadline entered is already expired
 
     temp->time = deadlinedate;
     temp->time1 = deadlinetime;
-    writeDataToFile();
+    writeDataToFile(username);
 }
 
-void edit_task()
+void edit_task(string username)
 {
     cout << "Enter the task number which you want to edit" << endl;
     ll k;
@@ -843,7 +842,7 @@ void edit_task()
         getline(cin, task_type_user);
         temp->type = task_type_user;
         type_task.insert(task_type_user);
-        writeDataToFile();
+        writeDataToFile(username);
         break;
     }
     case 2:
@@ -853,7 +852,7 @@ void edit_task()
         cin.ignore(numeric_limits<streamsize>::max(), '\n'); // igonres newline char
         cin >> task_imp_lvl;
         temp->imp_lvl = task_imp_lvl;
-        writeDataToFile();
+        writeDataToFile(username);
         break;
     }
     case 3:
@@ -863,7 +862,7 @@ void edit_task()
         cin.ignore(numeric_limits<streamsize>::max(), '\n'); // igonres newline char
         getline(cin, task_message);
         temp->message = task_message;
-        writeDataToFile();
+        writeDataToFile(username);
         break;
     }
     }
@@ -1035,9 +1034,10 @@ void delete_daily_task()
     cout << "Task removed ." << endl;
 }
 
-void write_daily_task()
+void write_daily_task(string username)
 {
-    ofstream file("dailytask_data.txt"); // Open the file named "dailytask_data.txt" for writing
+    string fle = username + "dailytask_data.txt";
+    ofstream file(fle); // Open the file named "dailytask_data.txt" for writing
     if (file.is_open())
     {
         if (head_daily->next == NULL)
@@ -1071,9 +1071,10 @@ void write_daily_task()
     }
 }
 
-void load_daily_task_file()
+void load_daily_task_file(string username)
 {
-    ifstream file("dailytask_data.txt");
+    string fle = username + "dailytask_data.txt";
+    ifstream file(fle);
     if (file.is_open())
     {
         string line;
@@ -1100,9 +1101,10 @@ void load_daily_task_file()
         file.close();
     }
 }
-void erase_all_daily_task()
+void erase_all_daily_task(string username)
 {
-    ofstream file("dailytask_data.txt", ofstream::out | ofstream::trunc);
+    string fle = username + "dailytask_data.txt";
+    ofstream file(fle, ofstream::out | ofstream::trunc);
     if (file.is_open())
     {
         file.close();
@@ -1117,12 +1119,56 @@ void erase_all_daily_task()
 
 // Daiy task block ended
 
+void loaduname(set<string> &unames)
+{
+    ifstream infile("usernames.txt");
+    if (!infile.good())
+    {
+        // If file doesn't exist, create an empty one
+        ofstream createFile("usernames.txt");
+        createFile.close();
+        return;
+    }
+    string username;
+    while (infile >> username)
+    {
+        unames.insert(username);
+    }
+    infile.close();
+}
+
+void writeuname(const set<string> &unames)
+{
+    ofstream outfile("usernames.txt");
+    for (const string &username : unames)
+    {
+        outfile << username << endl;
+    }
+    outfile.close();
+}
+
+
+//*************** Main function ****************
+
 int main()
 {
-    loadDataFromFile();
-    load_daily_task_file();
+    cout << "Enter the username (CASE SENSITIVE):" << endl;
+    set<string> unames;
+    loaduname(unames);
+    string username;
+    ll cnt = unames.size(); // This cnt is important to check that wether username is present or not
+    cin >> username;
+    unames.insert(username);
+    writeuname(unames);
+    if (cnt != unames.size())
+    {
+        goto skip;
+    }
+    load_daily_task_file(username);
     display_incomplete_dailytask();
-    alaram(head_common); // function to remove tasks whose deadline is over
+skip:
+    loadDataFromFile(username);
+    alaram(head_common, username); // function to remove tasks whose deadline is over
     reminder_x_hr(12);
     ll x = 1;
     while (1)
@@ -1156,22 +1202,23 @@ int main()
         }
         case 3:
         {
-            eraseFileContents("task_data.txt");
+            string fle = username + "task_data";
+            eraseFileContents(fle);
             break;
         }
         case 4:
         {
-            remove_tasks();
+            remove_tasks(username);
             break;
         }
         case 5:
         {
-            reschedule();
+            reschedule(username);
             break;
         }
         case 6:
         {
-            edit_task();
+            edit_task(username);
             break;
         }
         case 7:
@@ -1182,23 +1229,22 @@ int main()
         case 8:
         {
             insert_daily_task();
-            write_daily_task();
             break;
         }
         case 9:
         {
             delete_daily_task();
-            write_daily_task();
+            write_daily_task(username);
             break;
         }
         case 10:
         {
-            erase_all_daily_task();
+            erase_all_daily_task(username);
             break;
         }
         case 11:
         {
-            writeDataToFile();
+            writeDataToFile(username);
             goto end;
             break;
         }
