@@ -18,6 +18,44 @@ set<string> type_task;
 // Linked List implementation for the managing the task
 // Defination of the Node for the common list, specific type list
 
+class Node_daily
+{
+    string type, message, deadline;
+    ll imp_lvl;
+    Node_daily *next;
+    Node_daily *prev;
+
+public:
+    Node_daily(string s)
+    {
+        type = s;
+        message = "";
+        imp_lvl = 0;
+        deadline = "";
+        next = NULL;
+        prev = NULL;
+    }
+    Node_daily(string s, string m, ll a, string deadlinetime)
+    {
+        type = s;
+        message = m;
+        imp_lvl = a;
+        deadline = deadlinetime;
+        next = NULL;
+        prev = NULL;
+    }
+    friend bool compare_time_daily(string);
+    friend void insert_daily_task();
+    friend void display_daily();
+    friend void display_incomplete_dailytask();
+    friend void delete_daily_task();
+    friend void write_daily_task(string);
+    friend void load_daily_task_file(string);
+    friend void erase_all_daily_task(string);
+    friend void insert_daily(string deadlinetime, string type, string message, ll imp_lvl);
+};
+
+Node_daily *head_daily = new Node_daily("Daily Task");
 class Node
 {
     string time, time1, type, message;
@@ -82,16 +120,16 @@ public:
     friend void insert_task_common(string, string, string, string, ll);
     friend void createlist();
     friend int priority(Node *, Node *);
-    friend void print_common_list(Node*head_common);
-    friend void writeDataToFile();
+    friend void print_common_list(Node *head_common);
+    friend void writeDataToFile(string);
     friend void eraseFileContents(const string &);
     friend bool cmoparet2ime(Node *current, ll chour, ll cminute, ll csecond, ll cdate, ll cmonth, ll cyear);
     friend void reminder_x_hr(ll);
-    friend void remove_tasks();
-    friend void alaram(Node*);
+    friend void remove_tasks(string);
+    friend void alaram(Node *, string);
     friend bool is_list_empty();
-    friend void reschedule();
-    friend void edit_task();
+    friend void reschedule(string);
+    friend void edit_task(string);
     friend void daily_task();
     friend void insert_task_daily();
 };
@@ -330,7 +368,7 @@ again: // Brings here when deadline entered is already expired
     insert_task_common(deadlinedate, deadlinetime, task_type_user, message, imp_lvl_user);
 }
 
-void print_common_list(Node*head)
+void print_common_list(Node *head)
 {
     ll cnt = 1;
     if (head->next != NULL)
@@ -360,9 +398,10 @@ void print_common_list(Node*head)
 }
 
 // function to write data to the file
-void writeDataToFile()
+void writeDataToFile(string username)
 {
-    ofstream file("task_data.txt"); // Open the file named "task_data.txt" for writing
+    string fle = username + "task_data";
+    ofstream file(fle); // Open the file named "task_data.txt" for writing
     if (file.is_open())
     {
         Node *temp = head_common->next;
@@ -400,9 +439,10 @@ void writeDataToFile()
 }
 
 // function to retrieve data from file
-void loadDataFromFile()
+void loadDataFromFile(string username)
 {
-    ifstream file("task_data.txt");
+    string fle = username + "task_data";
+    ifstream file(fle);
     if (file.is_open())
     {
         string line;
@@ -647,12 +687,12 @@ void reminder_x_hr(ll rhour)
     }
 }
 
-void remove_tasks()
+void remove_tasks(string username)
 {
     Node *temp = head_common;
     if (is_list_empty())
     {
-        cout << "There is no task int the list." << endl;
+        cout << "There is no task in the list." << endl;
         return;
     }
     cout << "Enter the task number to be removed" << endl;
@@ -671,14 +711,14 @@ void remove_tasks()
     }
     Node *p = temp->prev;
     p->next = temp->next;
-    if (temp->next != nullptr)
+    if (temp->next != NULL)
         temp->next->prev = p;
     delete temp;
     cout << "Task removed ." << endl;
-    writeDataToFile();
+    writeDataToFile(username);
 }
 
-void alaram(Node* head)
+void alaram(Node *head, string username)
 {
     time_t currentTime = time(0);
     tm *ct = localtime(&currentTime); // ct= stores currenttime
@@ -711,7 +751,7 @@ void alaram(Node* head)
     }
     if (excess_year)
         year++;
-    
+
     /*  cout << year << " " << month << " " << date << " " << hour << " " << minute << " " << second << endl; */
 
     Node *temp = head;
@@ -737,10 +777,10 @@ void alaram(Node* head)
         cout << red << "completed tasks are removed" << endl;
         cout << "\033[0m" << endl;
     }
-    writeDataToFile();
+    writeDataToFile(username);
 }
 
-void reschedule()
+void reschedule(string username)
 {
     Node *temp = head_common;
     if (is_list_empty())
@@ -810,10 +850,10 @@ again: // Brings here when deadline entered is already expired
 
     temp->time = deadlinedate;
     temp->time1 = deadlinetime;
-    writeDataToFile();
+    writeDataToFile(username);
 }
 
-void edit_task()
+void edit_task(string username)
 {
     cout << "Enter the task number which you want to edit" << endl;
     ll k;
@@ -851,7 +891,7 @@ void edit_task()
         getline(cin, task_type_user);
         temp->type = task_type_user;
         type_task.insert(task_type_user);
-        writeDataToFile();
+        writeDataToFile(username);
         break;
     }
     case 2:
@@ -861,7 +901,7 @@ void edit_task()
         cin.ignore(numeric_limits<streamsize>::max(), '\n'); // igonres newline char
         cin >> task_imp_lvl;
         temp->imp_lvl = task_imp_lvl;
-        writeDataToFile();
+        writeDataToFile(username);
         break;
     }
     case 3:
@@ -871,17 +911,425 @@ void edit_task()
         cin.ignore(numeric_limits<streamsize>::max(), '\n'); // igonres newline char
         getline(cin, task_message);
         temp->message = task_message;
-        writeDataToFile();
+        writeDataToFile(username);
         break;
     }
     }
 }
+
+// Daily task block
+
+bool compare_time_daily(string deadline)
+{
+    int hour, minute, seconds;
+    extractTimeComponents(deadline, hour, minute, seconds);
+    time_t currentTime = time(0);
+    tm *ct = localtime(&currentTime); // ct= stores currenttime
+
+    ll chour = ct->tm_hour, cminute = ct->tm_min, csecond = ct->tm_sec;
+    // Compare hours
+    if (hour < chour)
+        return false;
+    else if (hour > chour)
+        return true;
+
+    // Compare minutes
+    if (minute < cminute)
+        return false;
+    else if (minute > cminute)
+        return true;
+
+    // Compare seconds
+    if (seconds < csecond)
+        return false;
+
+    // Default: If all components are equal, return true
+    return true;
+}
+void insert_daily(string deadlinetime, string task_type_user, string message, ll imp_lvl_user)
+{
+    Node_daily *temp = head_daily;
+    while (temp->next != NULL)
+    {
+        temp = temp->next;
+    }
+    Node_daily *insert = new Node_daily(task_type_user, message, imp_lvl_user, deadlinetime);
+    if (head_daily->next == NULL)
+    {
+        head_daily->next = insert;
+        insert->prev = head_daily;
+    }
+    else
+    {
+        insert->prev = temp;
+        temp->next = insert;
+    }
+}
+
+void insert_daily_task()
+{
+    cout << "Enter the type of daily task:" << endl;
+    string task_type_user;
+    cin.ignore(numeric_limits<streamsize>::max(), '\n'); // igonres newline char
+    getline(cin, task_type_user);
+    cout << "Enter the Integral Importance level of this task:" << endl;
+    ll imp_lvl_user;
+    cin >> imp_lvl_user;
+    string deadlinetime, message;
+
+    cout << "Enter the time of the task(FORMAT = HHMMSS):" << endl;
+    cin.ignore(numeric_limits<streamsize>::max(), '\n'); // igonres newline char
+    getline(cin, deadlinetime);
+
+    // This passage of code is for taking valid input of deadline DATE
+    if (deadlinetime.size() != 6)
+    {
+        cout << "Please Enter valid time in correct format" << endl;
+    }
+    while (deadlinetime.size() != 6)
+    {
+        cin.ignore(numeric_limits<streamsize>::max(), '\n'); // igonres newline char
+        getline(cin, deadlinetime);
+        if (deadlinetime.size() != 6)
+        {
+            cout << "Please Enter valid time in correct format" << endl;
+        }
+    }
+
+    cout << "Enter the message you want with the remainder:" << endl;
+    getline(cin, message);
+
+    transform(task_type_user.begin(), task_type_user.end(), task_type_user.begin(), ::tolower);
+    insert_daily(deadlinetime, task_type_user, message, imp_lvl_user);
+}
+
+void display_daily()
+{
+    Node_daily *temp = head_daily;
+    ll cnt = 1;
+    if (temp->next == NULL)
+    {
+        cout << "No task in daily task list." << endl;
+        return;
+    }
+    while (temp->next != NULL)
+    {
+        temp = temp->next;
+        cout << endl;
+        cout << red << "TASK: " << cnt++ << endl;
+        cout << "\033[0m";
+        cout << "Type: " << temp->type << endl;
+        cout << "Impotance level: " << temp->imp_lvl << endl;
+        cout << "Time:" << temp->deadline << endl;
+        cout << "Message: " << temp->message << endl;
+    }
+}
+
+void display_incomplete_dailytask()
+{
+    cout << endl;
+    cout << red << "Incomplete Daily tasks:" << endl;
+    cout << "\033[0m" << endl;
+    Node_daily *temp = head_daily;
+    ll cnt = 1, k = 0;
+    while (temp->next != NULL && !compare_time_daily(temp->next->deadline))
+    {
+        temp = temp->next;
+    }
+    while (temp->next != NULL)
+    {
+        k = 1;
+        temp = temp->next;
+        cout << yellow << "TASK: " << cnt++ << endl;
+        cout << "\033[0m" << endl;
+        cout << "Type: " << temp->type << endl;
+        cout << "Impotance level: " << temp->imp_lvl << endl;
+        cout << "Time:" << temp->deadline << endl;
+        cout << "Message: " << temp->message << endl;
+    }
+    if (k == 0)
+    {
+        cout << "No Incomplete daily task" << endl;
+    }
+}
+
+void delete_daily_task()
+{
+    Node_daily *temp = head_daily;
+    if (temp->next == NULL)
+    {
+        cout << "There is no task in the Daily task list." << endl;
+        return;
+    }
+    cout << "Enter the task number to be removed" << endl;
+    ll k;
+    cin >> k;
+    ll cnt = 0;
+    while (temp->next != NULL && cnt < k)
+    {
+        temp = temp->next;
+        ++cnt;
+    }
+    while (cnt < k || k == 0)
+    {
+        cout << "Enter a valid task number to be removed" << endl;
+        cin >> k;
+    }
+    Node_daily *p = temp->prev;
+    p->next = temp->next;
+    if (temp->next != NULL)
+        temp->next->prev = p;
+    delete temp;
+    cout << "Task removed ." << endl;
+}
+
+void write_daily_task(string username)
+{
+    string fle = username + "dailytask_data.txt";
+    ofstream file(fle); // Open the file named "dailytask_data.txt" for writing
+    if (file.is_open())
+    {
+        if (head_daily->next == NULL)
+        {
+            return;
+        }
+        Node_daily *temp = head_daily->next;
+        while (temp != NULL)
+        {
+            string deadlinetime = temp->deadline;
+            string type = temp->type;
+            string message = temp->message;
+            ll imp_lvl = temp->imp_lvl;
+            size_t pos;
+            while ((pos = deadlinetime.find("$#")) != string::npos)
+            {
+                deadlinetime.replace(pos, 2, "@@");
+            }
+            while ((pos = type.find("$#")) != string::npos)
+            {
+                type.replace(pos, 2, "@@");
+            }
+            while ((pos = message.find("$#")) != string::npos)
+            {
+                message.replace(pos, 2, "@@");
+            }
+            file << deadlinetime << "$#" << type << "$#" << message << "$#" << imp_lvl << '\n';
+            temp = temp->next;
+        }
+        file.close();
+    }
+}
+
+void load_daily_task_file(string username)
+{
+    string fle = username + "dailytask_data.txt";
+    ifstream file(fle);
+    if (file.is_open())
+    {
+        string line;
+        while (getline(file, line))
+        {
+            // Replace occurrences of "$#" with a different delimiter '|'
+            size_t pos;
+            while ((pos = line.find("$#")) != string::npos)
+            {
+                line.replace(pos, 2, "|"); // Replace "$#" with '|'
+            }
+            // Tokenize the modified line using '|' as the delimiter
+            stringstream ss(line);
+            string deadlinedate, deadlinetime, type, message, imp_lvl_str;
+            if (getline(ss, deadlinetime, '|') &&
+                getline(ss, type, '|') &&
+                getline(ss, message, '|') &&
+                getline(ss, imp_lvl_str, '|'))
+            {
+                ll imp_lvl = stoll(imp_lvl_str);                    // Convert importance level string to long long
+                insert_daily(deadlinetime, type, message, imp_lvl); // Insert task into the linked list
+            }
+        }
+        file.close();
+    }
+}
+void erase_all_daily_task(string username)
+{
+    string fle = username + "dailytask_data.txt";
+    ofstream file(fle, ofstream::out | ofstream::trunc);
+    if (file.is_open())
+    {
+        file.close();
+        head_daily->next = NULL;
+        cout << "File contents erased successfully." << endl;
+    }
+    else
+    {
+        cerr << "Unable to open file for erasing." << endl;
+    }
+}
+
+// Daiy task block ended
+
+void loaduname(set<string> &unames)
+{
+    ifstream infile("usernames.txt");
+    if (!infile.good())
+    {
+        // If file doesn't exist, create an empty one
+        ofstream createFile("usernames.txt");
+        createFile.close();
+        return;
+    }
+    string username;
+    while (infile >> username)
+    {
+        unames.insert(username);
+    }
+    infile.close();
+}
+
+void writeuname(const set<string> &unames)
+{
+    ofstream outfile("usernames.txt");
+    for (set<string>::iterator i = unames.begin(); i != unames.end(); i++)
+    {
+        outfile << *i << endl;
+    }
+    outfile.close();
+}
+
+void writeuser_pass(const vector<pair<string, string> > &user_pass)
+{
+    ofstream outfile("user_pass.txt", ios::app); // Open file in append mode
+    if (outfile.is_open())
+    {
+        for (ll i=0;i<user_pass.size();i++)
+        {
+            outfile << user_pass[i].first << "$#" << user_pass[i].second << endl;
+        }
+        outfile.close();
+    }
+    else
+    {
+        cout << "Unable to open file for writing." << endl;
+    }
+}
+
+void readuser_pass(vector<pair<string, string> >&user_pass)
+{
+    ifstream infile("user_pass.txt");
+    if (infile.is_open())
+    {
+        string line;
+        while (getline(infile, line))
+        {
+            size_t pos = line.find("$#");
+            if (pos != string::npos)
+            {
+                string username = line.substr(0, pos);
+                string password = line.substr(pos + 2); // Skipping $# separator
+                user_pass.push_back(make_pair(username, password));
+            }
+        }
+        infile.close();
+    }
+    else
+    {
+        cout << "File does not exist. Creating new file." << endl;
+        ofstream outfile("user_pass.txt");
+        outfile.close();
+    }
+}
+
+//*************** Main function ****************
+
 int main()
 {
-    loadDataFromFile();
-    alaram(head_common); // function to remove tasks whose deadline is over
-    reminder_x_hr(12);
+    set<string> unames; // stores all the pre-existing usernames
+    loaduname(unames);
+    ll cnt = unames.size(); // This cnt is important to check that wether username is present or not
+    string username, password;
+    vector<pair<string, string> > user_pass;
+    readuser_pass(user_pass);
+    cout << "Enter 1 to signup" << endl;
+    cout << "Enter 2 to login to your id" << endl;
+    cout << "Enter 3 to Exit" <<endl;
+    int user_login;
+    cin >> user_login;
     ll x = 1;
+    if (user_login == 1)
+    {
+        cout << "Enter the username (CASE SENSITIVE and WITHOUT SPACE):" << endl;
+        cin >> username;
+        unames.insert(username);
+        while (cnt == unames.size())
+        {
+            cout << "This username is not available" << endl;
+            cin >> username;
+            unames.insert(username);
+        }
+        cout << "Enter yor 8 character password" << endl;
+        {
+            cin >> password;
+            while (password.size() != 8)
+            {
+                cout << "Enter password as mentioned above" << endl;
+                cin >> password;
+            }
+        }
+        user_pass.push_back(make_pair(username, password));
+        writeuser_pass(user_pass);
+    }
+    else if(user_login==2)
+    {
+    useragain:
+        cout << "Enter the username (CASE SENSITIVE and WITHOUT SPACE):" << endl;
+        cin >> username;
+        int condition = 0;
+        for (set<string>::iterator i = unames.begin(); i != unames.end(); i++)
+        {
+            if (*i == username)
+            {
+                condition = 1;
+                break;
+            }
+        }
+        if (!condition)
+        {
+            cout << "Username Does not exist. Enter again" << endl;
+            goto useragain;
+        }
+        else
+        {
+            cout << "Enter password" << endl;
+        passagain:
+            cin >> password;
+            ll i = 0;
+            while (i < user_pass.size() && user_pass[i].first != username)
+            {
+                ++i;
+            }
+            while (i < user_pass.size() && user_pass[i].second != password)
+            {
+                cout << "Wrong password , Enter again ." << endl;
+                goto passagain;
+            }
+        }
+    }
+    else
+    {
+        goto end;
+    }
+    writeuname(unames);
+    if (user_login == 1)
+    {
+        cout << username << " , Welcome to TASK MANAGER " << endl;
+        goto skip;
+    }
+    load_daily_task_file(username);
+    display_incomplete_dailytask();
+skip:
+    loadDataFromFile(username);
+    alaram(head_common, username); // function to remove tasks whose deadline is over
+    reminder_x_hr(12);
     while (1)
     {
         cout << endl;
@@ -891,8 +1339,11 @@ int main()
         cout << "Enter 4 to remove a task" << endl;
         cout << "Enter 5 to reschedule a task" << endl;
         cout << "Enter 6 to edit any task" << endl;
-        cout << "Enter 7 to insert a task as the daily task" << endl;
-        cout << "Enter 8 to exit." << endl;
+        cout << "Enter 7 to display all daily tasks" << endl;
+        cout << "Enter 8 to insert a task as the daily task" << endl;
+        cout << "Enter 9 to delete a daily task" << endl;
+        cout << "Enter 10 to erase all daily tasks" << endl;
+        cout << "Enter 11 to exit." << endl;
         ll y;
         cin >> y;
         switch (y)
@@ -910,32 +1361,49 @@ int main()
         }
         case 3:
         {
-            eraseFileContents("task_data.txt");
+            string fle = username + "task_data";
+            eraseFileContents(fle);
             break;
         }
         case 4:
         {
-            remove_tasks();
+            remove_tasks(username);
             break;
         }
         case 5:
         {
-            reschedule();
+            reschedule(username);
             break;
         }
         case 6:
         {
-            edit_task();
+            edit_task(username);
             break;
         }
         case 7:
         {
-
+            display_daily();
             break;
         }
         case 8:
         {
-            writeDataToFile();
+            insert_daily_task();
+            break;
+        }
+        case 9:
+        {
+            delete_daily_task();
+            write_daily_task(username);
+            break;
+        }
+        case 10:
+        {
+            erase_all_daily_task(username);
+            break;
+        }
+        case 12:
+        {
+            writeDataToFile(username);
             goto end;
             break;
         }
