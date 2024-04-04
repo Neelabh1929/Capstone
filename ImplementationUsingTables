@@ -7,6 +7,7 @@
 #include<string.h>
 #include<stdbool.h>
 #include<stdlib.h>
+#include<dirent.h>
 using namespace std;
 
 class Time;
@@ -551,7 +552,7 @@ void CreateTask()
 	strcat(d,e);
 	FILE* f;
 	f=fopen(d,"a");
-	fprintf(f,"%d %s %d %s %s %d %d\n",C.priority,C.task,C.Linked,C.date,C.time1,C.taskDone,C.ExeStat);
+	fprintf(f, "%s  %s  %s %d  %d  %d %d\n",C.task,C.date,C.time1,C.priority,C.Linked,C.taskDone,C.ExeStat);
 	fclose(f);
 }
 
@@ -694,6 +695,50 @@ void deletetask() {
         cerr << "File not found: " << g << endl;
     }
 }
+void reminder(){
+    Date C;
+	char g[32];
+	g[0]=0;
+	strcat(g,"C:/Schedule/");
+	strcat(g,C.ShowDateStr());
+    DIR *dir;
+    struct dirent *entry;
+    char *directoryPath =  g; 
+
+    dir = opendir(directoryPath);
+    if (dir == NULL) {
+        perror("Error opening directory");
+        
+    }
+    else{
+	
+    printf("Today's tasks:----\n\n");
+
+    while ((entry = readdir(dir)) != NULL) {
+        char filePath[1024];
+        strcpy(filePath, directoryPath);
+        strcat(filePath, "/");
+        strcat(filePath, entry->d_name);
+
+        FILE *file = fopen(filePath, "r");
+        if (file) {
+            printf("File: %s\n", entry->d_name);
+            char line[1024];
+        
+            	fgets(line, sizeof(line), file);
+            	printf(line);
+			
+			printf("\n");
+            fclose(file);
+        }
+    }
+
+    closedir(dir);
+}
+    
+}
+
+    
 
 
 
@@ -702,7 +747,7 @@ void UserInterface()
 	bool repeat=true;
 	while(repeat)
 	{
-		cout<<"Enter (0,1,2,3) if you want to create a task,show task,stop app,delete task"<<endl;
+		cout<<"Enter (0,1,2,3,4) if you want to create a task,show task,stop app,delete task,to get a reminder"<<endl;
 		int a;
 		cin>>a;
 		switch (a)
@@ -719,13 +764,16 @@ void UserInterface()
 			case 3:
 				deletetask();
 				break;
-				
+			case 4:
+				reminder();
+				break;
 			default:
 				cout<<"Enter a valid number"<<endl;
 				break;
 		}
 	}
 }
+
 
 int main()
 {
