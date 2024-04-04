@@ -1140,28 +1140,139 @@ void loaduname(set<string> &unames)
 void writeuname(const set<string> &unames)
 {
     ofstream outfile("usernames.txt");
-    for (const string &username : unames)
+    for (set<string>::iterator i = unames.begin(); i != unames.end(); i++)
     {
-        outfile << username << endl;
+        outfile << *i << endl;
     }
     outfile.close();
 }
 
+void writeuser_pass(const vector<pair<string, string> > &user_pass)
+{
+    ofstream outfile("user_pass.txt", ios::app); // Open file in append mode
+    if (outfile.is_open())
+    {
+        for (ll i=0;i<user_pass.size();i++)
+        {
+            outfile << user_pass[i].first << "$#" << user_pass[i].second << endl;
+        }
+        outfile.close();
+    }
+    else
+    {
+        cout << "Unable to open file for writing." << endl;
+    }
+}
+
+void readuser_pass(vector<pair<string, string> >&user_pass)
+{
+    ifstream infile("user_pass.txt");
+    if (infile.is_open())
+    {
+        string line;
+        while (getline(infile, line))
+        {
+            size_t pos = line.find("$#");
+            if (pos != string::npos)
+            {
+                string username = line.substr(0, pos);
+                string password = line.substr(pos + 2); // Skipping $# separator
+                user_pass.push_back(make_pair(username, password));
+            }
+        }
+        infile.close();
+    }
+    else
+    {
+        cout << "File does not exist. Creating new file." << endl;
+        ofstream outfile("user_pass.txt");
+        outfile.close();
+    }
+}
 
 //*************** Main function ****************
 
 int main()
 {
-    cout << "Enter the username (CASE SENSITIVE):" << endl;
-    set<string> unames;
+    set<string> unames; // stores all the pre-existing usernames
     loaduname(unames);
-    string username;
     ll cnt = unames.size(); // This cnt is important to check that wether username is present or not
-    cin >> username;
-    unames.insert(username);
-    writeuname(unames);
-    if (cnt != unames.size())
+    string username, password;
+    vector<pair<string, string> > user_pass;
+    readuser_pass(user_pass);
+    cout << "Enter 1 to signup" << endl;
+    cout << "Enter 2 to login to your id" << endl;
+    cout << "Enter 3 to Exit" <<endl;
+    int user_login;
+    cin >> user_login;
+    ll x = 1;
+    if (user_login == 1)
     {
+        cout << "Enter the username (CASE SENSITIVE and WITHOUT SPACE):" << endl;
+        cin >> username;
+        unames.insert(username);
+        while (cnt == unames.size())
+        {
+            cout << "This username is not available" << endl;
+            cin >> username;
+            unames.insert(username);
+        }
+        cout << "Enter yor 8 character password" << endl;
+        {
+            cin >> password;
+            while (password.size() != 8)
+            {
+                cout << "Enter password as mentioned above" << endl;
+                cin >> password;
+            }
+        }
+        user_pass.push_back(make_pair(username, password));
+        writeuser_pass(user_pass);
+    }
+    else if(user_login==2)
+    {
+    useragain:
+        cout << "Enter the username (CASE SENSITIVE and WITHOUT SPACE):" << endl;
+        cin >> username;
+        int condition = 0;
+        for (set<string>::iterator i = unames.begin(); i != unames.end(); i++)
+        {
+            if (*i == username)
+            {
+                condition = 1;
+                break;
+            }
+        }
+        if (!condition)
+        {
+            cout << "Username Does not exist. Enter again" << endl;
+            goto useragain;
+        }
+        else
+        {
+            cout << "Enter password" << endl;
+        passagain:
+            cin >> password;
+            ll i = 0;
+            while (i < user_pass.size() && user_pass[i].first != username)
+            {
+                ++i;
+            }
+            while (i < user_pass.size() && user_pass[i].second != password)
+            {
+                cout << "Wrong password , Enter again ." << endl;
+                goto passagain;
+            }
+        }
+    }
+    else
+    {
+        goto end;
+    }
+    writeuname(unames);
+    if (user_login == 1)
+    {
+        cout << username << " , Welcome to TASK MANAGER " << endl;
         goto skip;
     }
     load_daily_task_file(username);
@@ -1170,7 +1281,6 @@ skip:
     loadDataFromFile(username);
     alaram(head_common, username); // function to remove tasks whose deadline is over
     reminder_x_hr(12);
-    ll x = 1;
     while (1)
     {
         cout << endl;
@@ -1242,7 +1352,7 @@ skip:
             erase_all_daily_task(username);
             break;
         }
-        case 11:
+        case 12:
         {
             writeDataToFile(username);
             goto end;
