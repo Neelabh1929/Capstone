@@ -552,7 +552,7 @@ void CreateTask()
 	strcat(d,e);
 	FILE* f;
 	f=fopen(d,"a");
-	fprintf(f, "%s  %s  %s %d  %d  %d %d\n",C.task,C.date,C.time1,C.priority,C.Linked,C.taskDone,C.ExeStat);
+	fprintf(f,"%d %s %d %s %s %d %d\n",C.priority,C.task,C.Linked,C.date,C.time1,C.taskDone,C.ExeStat)
 	fclose(f);
 }
 
