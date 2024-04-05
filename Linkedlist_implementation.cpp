@@ -98,6 +98,7 @@ public:
         imp_lvl = 0;
         next = NULL;
         prev = NULL;
+
     }
 
     Node(string type1, ll i)
@@ -171,18 +172,43 @@ void extractTimeComponents(const string &time, int &hours, int &minutes, int &se
     minutes = stringToInt(time.substr(2, 2));
     seconds = stringToInt(time.substr(4, 2));
 }
-bool isValidTime(const string& time, int& hours, int& minutes, int& seconds) {
-    if (time.length() != 6) return false;
-
-    
-
-    // Check hours, minutes, and seconds for valid range
-    if (hours < 0 || hours >= 24) return false;
-    if (minutes < 0 || minutes >= 60) return false;
-    if (seconds < 0 || seconds >= 60) return false;
-
+bool correct_date(string deadlinedate) 
+{
+    int year,month,date;
+    extractDateComponents(deadlinedate,date,month,year);
+    if (year <= 0)
+    return false;
+    if (month < 1 || month > 12)
+    return false;
+    switch (month) 
+    {
+        case 1: case 3: case 5: case 7: case 8: case 10: case 12:
+            return (date >= 1 && date <= 31);
+        case 4: case 6: case 9: case 11:
+            return (date >= 1 && date <= 30);
+        case 2:
+            if (year % 4 == 0 && (year % 100 != 0 || year % 400 == 0)) 
+            {
+                return (date >= 1 && date <= 29);
+            } 
+            else 
+            {
+                return (date >= 1 && date <= 28);
+            }
+    }
     return true;
 }
+
+bool correct_time(string deadlinetime)
+{
+    int hour,minute,second;
+    extractTimeComponents(deadlinetime,hour,minute,second);
+    cout<<hour<<" "<<minute<<" "<<hour<<endl;
+    if(hour>=24 || minute>=60 || second>=60 || hour<0 || minute<0 || second<0)
+    return false;
+    return true;
+}
+
 // defination of the priority function
 int priority(Node *temp, Node *temp_insert)
 {
@@ -331,16 +357,16 @@ again: // Brings here when deadline entered is already expired
 
     cout << "Enter the Deadline date of the task(FORMAT = DDMMYYYY):" << endl;
     getline(cin, deadlinedate);
-
+    int month,year,date,hour,minute,seconds;
     // This passage of code is for taking valid input of deadline DATE
-    if (deadlinedate.size() != 8)
+    if (deadlinedate.size() != 8 || !correct_date(deadlinedate))
     {
         cout << "Please Enter valid date in correct format" << endl;
     }
-    while (deadlinedate.size() != 8)
+    while (deadlinedate.size() != 8 || !correct_date(deadlinedate))
     {
         getline(cin, deadlinedate);
-        if (deadlinedate.size() != 8)
+        if (deadlinedate.size() != 8 || !correct_date(deadlinedate)) 
         {
             cout << "Please Enter valid date in correct format" << endl;
         }
@@ -348,16 +374,15 @@ again: // Brings here when deadline entered is already expired
 
     cout << "Enter the Deadline time of the task(FORMAT = HHMMSS):" << endl;
     getline(cin, deadlinetime);
-
     // This passage of code is for taking valid input of deadline DATE
-    if (deadlinetime.size() != 6)
+    if (deadlinetime.size() != 6 || !correct_time(deadlinetime))
     {
         cout << "Please Enter valid time in correct format" << endl;
     }
-    while (deadlinetime.size() != 6)
+    while (deadlinetime.size() != 6 || !correct_time(deadlinetime))
     {
         getline(cin, deadlinetime);
-        if (deadlinetime.size() != 6)
+        if (deadlinetime.size() != 6 || !correct_time(deadlinetime))
         {
             cout << "Please Enter valid time in correct format" << endl;
         }
@@ -549,98 +574,49 @@ bool cmoparet2ime(Node *current, ll chour, ll cminute, ll csecond, ll cdate, ll 
     return true;
 }
 
-// bool checkdate(ll month, ll *date, ll year)
-// {
-//     if (month == 1 || month == 3 || month == 5 || month == 7 || month == 8 | month == 10 || month == 12)
-//     {
-//         if (*date > 31)
-//         {
-//             *date = 1;
-//             return 1;
-//         }
-//         return 0;
-//     }
-//     else if (month == 4 || month == 6 || month == 9 || month == 11)
-//     {
-//         if (*date > 30)
-//         {
-//             *date = 1;
-//             return 1;
-//         }
-//         return 0;
-//     }
-//     else
-//     {
-//         if ((year % 4 == 0 && year % 100 != 0) || (year % 400 == 0))
-//         {
-//             if (*date > 28)
-//             {
-//                 *date = 1;
-//                 return 1;
-//             }
-//             return 0;
-//         }
-//         else
-//         {
-//             if (*date > 29)
-//             {
-//                 *date = 1;
-//                 return 1;
-//             }
-//             return 0;
-//         }
-//     }
-// }
-
 bool checkdate(ll month, ll *date, ll year)
 {
-    // Check for leap year
-    bool isLeapYear = (year % 4 == 0 && (year % 100 != 0 || year % 400 == 0));
-    
-    if (month == 1 || month == 3 || month == 5 || month == 7 || month == 8 || month == 10 || month == 12)
+    if (month == 1 || month == 3 || month == 5 || month == 7 || month == 8 | month == 10 || month == 12)
     {
         if (*date > 31)
         {
             *date = 1;
-            return true; // Date was adjusted
+            return 1;
         }
+        return 0;
     }
     else if (month == 4 || month == 6 || month == 9 || month == 11)
     {
         if (*date > 30)
         {
             *date = 1;
-            return true; // Date was adjusted
+            return 1;
         }
+        return 0;
     }
-    else if (month == 2)
+    else
     {
-        if (isLeapYear)
-        {
-            if (*date > 29)
-            {
-                *date = 1;
-                return true; // Date was adjusted
-            }
-        }
-        else
+        if ((year % 4 == 0 && year % 100 != 0) || (year % 400 == 0))
         {
             if (*date > 28)
             {
                 *date = 1;
-                return true; // Date was adjusted
+                return 1;
             }
+            return 0;
+        }
+        else
+        {
+            if (*date > 29)
+            {
+                *date = 1;
+                return 1;
+            }
+            return 0;
         }
     }
-    else
-    {
-        // Month is not validated so
-        *date = 1; 
-        return true; 
-    }
-
-    return false; 
 }
+
 bool is_list_empty()
 // This function is to check wether the list is empty or not
 {
@@ -818,36 +794,34 @@ void reschedule(string username)
 
 again: // Brings here when deadline entered is already expired
 
-    cout << "Enter the New Deadline date of the task(FORMAT = DDMMYYYY):" << endl;
-    cin.ignore(numeric_limits<streamsize>::max(), '\n');
+    cout << "Enter the Deadline date of the task(FORMAT = DDMMYYYY):" << endl;
     getline(cin, deadlinedate);
-
+    int month,year,date,hour,minute,seconds;
     // This passage of code is for taking valid input of deadline DATE
-    if (deadlinedate.size() != 8)
+    if (deadlinedate.size() != 8 || !correct_date(deadlinedate))
     {
         cout << "Please Enter valid date in correct format" << endl;
     }
-    while (deadlinedate.size() != 8)
+    while (deadlinedate.size() != 8 || !correct_date(deadlinedate))
     {
-        cin.ignore(numeric_limits<streamsize>::max(), '\n');
         getline(cin, deadlinedate);
-        if (deadlinedate.size() != 8)
+        if (deadlinedate.size() != 8 || !correct_date(deadlinedate))
         {
             cout << "Please Enter valid date in correct format" << endl;
         }
     }
-    cout << "Enter the New Deadline time of the task(FORMAT = HHMMSS):" << endl;
-    getline(cin, deadlinetime);
 
+    cout << "Enter the Deadline time of the task(FORMAT = HHMMSS):" << endl;
+    getline(cin, deadlinetime);
     // This passage of code is for taking valid input of deadline DATE
-    if (deadlinetime.size() != 6)
+    if (deadlinetime.size() != 6 || !correct_time(deadlinetime))
     {
         cout << "Please Enter valid time in correct format" << endl;
     }
-    while (deadlinetime.size() != 6)
+    while (deadlinetime.size() != 6 || !correct_time(deadlinetime))
     {
         getline(cin, deadlinetime);
-        if (deadlinetime.size() != 6)
+        if (deadlinetime.size() != 6 || !correct_time(deadlinetime))
         {
             cout << "Please Enter valid time in correct format" << endl;
         }
@@ -957,6 +931,8 @@ bool compare_time_daily(string deadline)
     // Default: If all components are equal, return true
     return true;
 }
+
+
 void insert_daily(string deadlinetime, string task_type_user, string message, ll imp_lvl_user)
 {
     Node_daily *temp = head_daily;
@@ -989,19 +965,18 @@ void insert_daily_task()
     string deadlinetime, message;
 
     cout << "Enter the time of the task(FORMAT = HHMMSS):" << endl;
-    cin.ignore(numeric_limits<streamsize>::max(), '\n'); // igonres newline char
+    cin.ignore();
     getline(cin, deadlinetime);
-
     // This passage of code is for taking valid input of deadline DATE
-    if (deadlinetime.size() != 6)
+    if (deadlinetime.size() != 6 || !correct_time(deadlinetime))
     {
         cout << "Please Enter valid time in correct format" << endl;
     }
-    while (deadlinetime.size() != 6)
+    while (deadlinetime.size() != 6 || !correct_time(deadlinetime))
     {
         cin.ignore(numeric_limits<streamsize>::max(), '\n'); // igonres newline char
         getline(cin, deadlinetime);
-        if (deadlinetime.size() != 6)
+        if (deadlinetime.size() != 6 || !correct_time(deadlinetime))
         {
             cout << "Please Enter valid time in correct format" << endl;
         }
@@ -1011,6 +986,7 @@ void insert_daily_task()
     getline(cin, message);
 
     transform(task_type_user.begin(), task_type_user.end(), task_type_user.begin(), ::tolower);
+
     insert_daily(deadlinetime, task_type_user, message, imp_lvl_user);
 }
 
@@ -1412,9 +1388,10 @@ skip:
             erase_all_daily_task(username);
             break;
         }
-        case 12:
+        case 11:
         {
             writeDataToFile(username);
+            write_daily_task(username);
             goto end;
             break;
         }
