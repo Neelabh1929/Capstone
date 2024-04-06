@@ -329,7 +329,34 @@ const deleteCategory = (id) => {
 //     // Re-render the categories
 //     renderCategories();
 // };
+// function toggleDarkMode() {
+//     var body = document.getElementById('body');
+//     var darkModeIcon = document.getElementById('dark-mode-icon');
 
+//     body.classList.toggle('dark-mode');
+
+//     if (body.classList.contains('dark-mode')) {
+//         darkModeIcon.classList.remove('bx-sun');
+//         darkModeIcon.classList.add('bx-moon');
+//     } else {
+//         darkModeIcon.classList.remove('bx-moon');
+//         darkModeIcon.classList.add('bx-sun');
+//     }
+// }
+function toggleDarkMode() {
+    var body = document.body;
+    var darkModeIcon = document.getElementById('dark-mode-icon');
+
+    body.classList.toggle('dark-mode');
+
+    if (body.classList.contains('dark-mode')) {
+        darkModeIcon.classList.remove('bx-sun');
+        darkModeIcon.classList.add('bx-moon');
+    } else {
+        darkModeIcon.classList.remove('bx-moon');
+        darkModeIcon.classList.add('bx-sun');
+    }
+}
 
 
 

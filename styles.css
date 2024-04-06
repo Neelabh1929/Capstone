@@ -174,7 +174,7 @@ body {
     width: 6rem;
     height: 6rem;
     border-radius: 50%;
-    background-color: #13523b;
+    
     z-index: -1;
 }
 
@@ -243,11 +243,11 @@ body {
 .category .toggle-btn {
     font-size: 1.5rem;
     cursor: pointer;
-    opacity: 0.7;
+    opacity: 1;
 }
 
 .category-screen .head-wrapper {
-    display: flex;
+    display: inline;
     justify-content: space-between;
     align-items: center;
 }
@@ -374,7 +374,6 @@ body {
 }
 
 .task-wrapper .delete:hover {
-    
     background-color: rgba(0, 0, 0, 0.1);
 }
 .menu-btn {
@@ -520,7 +519,7 @@ body {
     left: 50%;
     transform: translate(-50%);
     width: 135%;
-    height: 20rem;
+    height: 26.25rem;
     border-radius: 50% 50% 0 0;
     background-color: #fff;
 }
@@ -541,3 +540,85 @@ body {
     opacity: 1;
     visibility: visible;
 }
+
+/* .dark-mode{
+    width:16px;
+    height:8px
+} */
+/* 
+
+.dark-mode-toggle {
+    
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 10px;
+    height: 4px;
+    position: relative;
+    font-size: 2rem;
+}
+
+.tooltext {
+    visibility: hidden;
+    font-size: 0.8rem;
+}
+*/
+.dark-mode-toggle {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    color: #303030;
+}
+
+.dark-mode-toggle:hover .tooltext {
+    visibility: visible;
+    font-weight: 600;
+}
+
+.dark-mode-toggle .tooltext {
+    visibility: hidden;
+    font-size: 0.8rem;
+}
+
+.dark-mode-toggle i {
+    font-size: 2rem;
+}
+
+
+
+
+
+.dark-mode .screen-backdrop{
+    background-color: #204967;
+    color: #a7d72f;
+}
+
+.dark-mode .head-wrapper {
+    
+
+    color: #081529;
+}
+.dark-mode .add-task {
+    
+
+    color: #081529;
+}
+.dark-mode .add-task-backdrop  {
+    
+     background-color: #204967;
+        color: #081529;
+    }
+.dark-mode .add-btn {
+    
+        background-color: #204967;
+            color: #081529;
+        }
+           
+
+/* .dark-mode .categories-wrapper{
+    background-color: #3786ab;
+    color: #a7d72f;
+} */

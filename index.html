@@ -27,7 +27,17 @@
               <p>
                 You have <span class="totalTasks">5</span> tasks to complete!!
               </p>
-            </div>
+              <!-- <div class="dark-mode" onclick="toggleDarkmode()">
+                <i class="fa-sharp fa-regular fa-image" id></i>  
+                <span class="tooltext">Dark Mode</span>
+                
+            </div> -->
+            <div class="dark-mode-toggle" onclick="toggleDarkMode()">
+              <span class="tooltext">Toggle Dark Mode</span>
+              <i id="dark-mode-icon" class="bx bx-sun"></i>  
+          </div>
+            
+           </div>
             <div class="img">
               <div class="backdrop"></div>
               <img src="img/boss.png" alt="boss img" />
@@ -44,11 +54,7 @@
                   <p>5 Tasks</p>
                 </div>
               </div>
-              <div class="options">
-                <div class="toggle-btn">
-                  <i class="bx bx-dots-vertical-rounded"></i>
-                </div>
-              </div>
+              
             </div>
           </div>
         </div>
@@ -115,5 +121,6 @@
     </div>
 
     <script src="scri.js"></script>
+    <script src="https://kit.fontawesome.com/c5470b4f4d.js" crossorigin="anonymous"></script>
   </body>
 </html>
