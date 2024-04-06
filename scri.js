@@ -2,7 +2,7 @@ const wrapper = document.querySelector('.wrapper');
 const backBtn = document.querySelector('.back-btn');
 const menuBtn = document.querySelector('.menu-btn');
 const defaultCategoryImage = "design1.jpg"; 
-// localStorage.clear();
+// localStorage.clear();/
 
 const toggleScreen = () => {
     wrapper.classList.toggle('show-category');
@@ -142,20 +142,20 @@ const tasksContainer = document.querySelector('.tasks');
 //         }
 //     });
 // };
-const checkReminders = (tasks) => {
-    const currentTime = new Date().getTime(); // Current time in milliseconds
-    tasks.forEach(task => {
-        const dueTime = new Date(`${task.date} ${task.time}`).getTime(); // Due time in milliseconds
+// const checkReminders = (tasks) => {
+//     const currentTime = new Date().getTime(); // Current time in milliseconds
+//     tasks.forEach(task => {
+//         const dueTime = new Date(`${task.date} ${task.time}`).getTime(); // Due time in milliseconds
 
-        const timeDifference = dueTime - currentTime;
+//         const timeDifference = dueTime - currentTime;
 
-        if (timeDifference > 0) {
-            setTimeout(() => {
-                alert(`Reminder: Task "${task.task}" is due soon!`);
-            }, timeDifference);
-        }
-    });
-};
+//         if (timeDifference > 0) {
+//             setTimeout(() => {
+//                 alert(`Reminder: Task "${task.task}" is due soon!`);
+//             }, timeDifference);
+//         }
+//     });
+// };
 
 const renderTasks = () => {
     const normalizedSelectedCategory = selectedCategory.title.toLowerCase();
@@ -168,7 +168,6 @@ const renderTasks = () => {
     renderCategories();
     calculateTotal();
 
-    checkReminders(categoryTasks);
 };
 const createTaskHtml = (task) => {
     return `
@@ -190,23 +189,6 @@ const createTaskHtml = (task) => {
     </div>
     `;
 };
-
-
-// const createTaskHtml = (task) => {
-//     return `
-//     <div class="task-wrapper">
-//         <div class="task-date">${task.date}</div>
-//         <div class="task-date">${task.time}</div>
-
-//         <label class="task" for="${task.id}">
-//             <input type="checkbox" id="${task.id}" ${task.completed ? 'checked' : ''}>
-//             <span class="checkmark"><i class="bx bx-check"></i></span>
-//             <p>${task.task}</p>
-//         </label>
-//         <div class="delete"><i class="bx bxs-trash"></i></div>
-//     </div>
-//     `;
-// };
 
 const addTaskEventListeners = () => {
     document.querySelectorAll('.task-wrapper').forEach((taskWrapper, index) => {
@@ -372,6 +354,29 @@ function toggleDarkMode() {
     }
 }
 
+const calculateTimeDifference = (dueTime) => {
+    const currentTime = new Date().getTime();
+const timeDifference = dueTime - currentTime;
+return Math.floor(timeDifference / (1000 * 60 * 60));};
+  const updateReminderSection = () => {
+    const reminderTasksContainer = document.querySelector('.reminder-tasks');
+    reminderTasksContainer.innerHTML = '';
+  
+    const currentTime = new Date().getTime();
+  
+    tasks.forEach(task => {
+      const dueTime = new Date(`${task.date} ${task.time}`).getTime();
+      const timeDifferenceInHours = calculateTimeDifference(dueTime);
+  
+      if (timeDifferenceInHours <= 24 && timeDifferenceInHours >= 0) {
+        const listItem = document.createElement('li');
+        listItem.textContent = `${task.task} - Due in ${timeDifferenceInHours} hours`;
+        reminderTasksContainer.appendChild(listItem);
+      }
+    });
+  };
+  updateReminderSection();
+setInterval(updateReminderSection, 1000);
 
 
 getLocal();
