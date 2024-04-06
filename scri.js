@@ -128,14 +128,28 @@ const selectCategory = (category) => {
 };
 
 const tasksContainer = document.querySelector('.tasks');
-const checkReminders = (tasks) => {
-    const currentTime = new Date();
-    tasks.forEach(task => {
-        const dueTime = new Date(task.date);
-        const timeDifference = dueTime.getTime() - currentTime.getTime();
+// const checkReminders = (tasks) => {
+//     const currentTime = new Date();
+//     tasks.forEach(task => {
+//         const dueTime = new Date(task.date);
+//         const timeDifference = dueTime.getTime() - currentTime.getTime();
 
-        if (timeDifference > 0 
-            ) {
+//         if (timeDifference > 0 
+//             ) {
+//             setTimeout(() => {
+//                 alert(`Reminder: Task "${task.task}" is due soon!`);
+//             }, timeDifference);
+//         }
+//     });
+// };
+const checkReminders = (tasks) => {
+    const currentTime = new Date().getTime(); // Current time in milliseconds
+    tasks.forEach(task => {
+        const dueTime = new Date(`${task.date} ${task.time}`).getTime(); // Due time in milliseconds
+
+        const timeDifference = dueTime - currentTime;
+
+        if (timeDifference > 0) {
             setTimeout(() => {
                 alert(`Reminder: Task "${task.task}" is due soon!`);
             }, timeDifference);
