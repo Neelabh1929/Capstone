@@ -7,16 +7,25 @@
 #include <ctime>
 #include <fstream>
 #define ll long long
+#define colorend "\033[0m"
 using namespace std;
 
-char yellow[] = {0x1b, '[', '0', ';', '3', '3', 'm', 0}; // for text coloring
-char red[] = {0x1b, '[', '0', ';', '3', '1', 'm', 0};    // for text coloring
+//for text coloring
+char normal[] = {0x1b, '[', '0', ';', '3', '9', 'm', 0};
+char black[] = {0x1b, '[', '0', ';', '3', '0', 'm', 0};
+char red[] = {0x1b, '[', '0', ';', '3', '1', 'm', 0};
+char green[] = {0x1b, '[', '0', ';', '3', '2', 'm', 0};
+char yellow[] = {0x1b, '[', '0', ';', '3', '3', 'm', 0};
+char blue[] = {0x1b, '[', '0', ';', '3', '4', 'm', 0};
+char Upurple[] = {0x1b, '[', '4', ';', '3', '5', 'm', 0};
+char cyan[] = {0x1b, '[', '0', ';', '3', '6', 'm', 0};
+char lgray[] = {0x1b, '[', '0', ';', '3', '7', 'm', 0};
+char dgray[] = {0x1b, '[', '0', ';', '3', '8', 'm', 0};
+char underlinedgray[] = {0x1b, '[', '4', ';', '3', '8', 'm', 0};
+char Bred[] = {0x1b, '[', '1', ';', '3', '1', 'm', 0};
 
 // This set will store the type of the tasks already stored
 set<string> type_task;
-
-// Linked List implementation for the managing the task
-// Defination of the Node for the common list, specific type list
 
 class Node_daily
 {
@@ -70,7 +79,7 @@ public:
     Node(string t, string t1, string type1, string message1, ll i)
     {
         time = t; // time means deadline of the task
-        time1 = t1;
+        time1 = t1;//time1 means deadline time in hour,minute,second of the task
         type = type1;
         message = message1;
         imp_lvl = i;
@@ -117,7 +126,7 @@ public:
         prev = NULL;
     }
 
-    // All the friend functions
+    // All the friend functions of common Node clss
     friend void insert_task_common(string, string, string, string, ll);
     friend void createlist();
     friend int priority(Node *, Node *);
@@ -138,7 +147,7 @@ public:
 Node *head_common = new Node("Common task list");
 
 /***************************priority function block*************************************/
-ll stringToInt(const string &str)
+ll string_to_int(const string &str)
 {
     ll value = 0;
     for (size_t i = 0; i < str.length(); ++i)
@@ -151,31 +160,32 @@ ll stringToInt(const string &str)
         }
         else
         {
-            // Handle unexpected character
-            // For example, you might print an error message
-            cout << "Unexpected character encountered: " << c << endl;
+            //to handle unexpected character, print an error messaeg
+            cout <<red<< "Unexpected character encountered: "<<colorend << c << endl;
         }
     }
     return value;
 }
 
-void extractDateComponents(const string &date, int &day, int &month, int &year)
+void extract_datecomponents(const string &date, int &day, int &month, int &year)
 {
-    day = stringToInt(date.substr(0, 2));
-    month = stringToInt(date.substr(2, 2));
-    year = stringToInt(date.substr(4, 4));
+    day = string_to_int(date.substr(0, 2));
+    month = string_to_int(date.substr(2, 2));
+    year = string_to_int(date.substr(4, 4));
     // used substr as it works on only two arguments takes the initial position from where to start and the number of steps thus easy to extract
 }
-void extractTimeComponents(const string &time, int &hours, int &minutes, int &seconds)
+
+void extract_time_components(const string &time, int &hours, int &minutes, int &seconds)
 {
-    hours = stringToInt(time.substr(0, 2));
-    minutes = stringToInt(time.substr(2, 2));
-    seconds = stringToInt(time.substr(4, 2));
+    hours = string_to_int(time.substr(0, 2));
+    minutes = string_to_int(time.substr(2, 2));
+    seconds = string_to_int(time.substr(4, 2));
 }
+
 bool correct_date(string deadlinedate) 
 {
     int year,month,date;
-    extractDateComponents(deadlinedate,date,month,year);
+    extract_datecomponents(deadlinedate,date,month,year);
     if (year <= 0)
     return false;
     if (month < 1 || month > 12)
@@ -202,8 +212,7 @@ bool correct_date(string deadlinedate)
 bool correct_time(string deadlinetime)
 {
     int hour,minute,second;
-    extractTimeComponents(deadlinetime,hour,minute,second);
-    cout<<hour<<" "<<minute<<" "<<hour<<endl;
+    extract_time_components(deadlinetime,hour,minute,second);
     if(hour>=24 || minute>=60 || second>=60 || hour<0 || minute<0 || second<0)
     return false;
     return true;
@@ -216,9 +225,9 @@ int priority(Node *temp, Node *temp_insert)
     int day2, month2, year2;
 
     // date components from the current node temp
-    extractDateComponents(temp->time, day1, month1, year1);
+    extract_datecomponents(temp->time, day1, month1, year1);
     // date components from the node tempinsert
-    extractDateComponents(temp_insert->time, day2, month2, year2);
+    extract_datecomponents(temp_insert->time, day2, month2, year2);
 
     // Comparing year
     if (year1 < year2)
@@ -237,29 +246,32 @@ int priority(Node *temp, Node *temp_insert)
         return 1;
     else if (day1 > day2)
         return 0;
+
     int hours1, minutes1, seconds1, hours2, minutes2, seconds2;
-    extractTimeComponents(temp->time1, hours1, minutes1, seconds1);
-    extractTimeComponents(temp_insert->time1, hours2, minutes2, seconds2);
+    extract_time_components(temp->time1, hours1, minutes1, seconds1);
+    extract_time_components(temp_insert->time1, hours2, minutes2, seconds2);
 
     // Compare hours, then minutes, then seconds
-    // Comparing year
+    //comparing hours
     if (hours1 < hours2)
         return 1;
     else if (hours1 > hours2)
         return 0;
 
-    // Compareng month
+    // comparing minutes
     if (minutes1 < minutes2)
         return 1;
     else if (minutes1 > minutes2)
         return 0;
 
-    // Comparing day
+    // comparing day
     if (seconds1 < seconds2)
         return 1;
+
     else if (seconds1 > seconds2)
         return 0;
     // If dates are equal then compare importance levels   ***still to update for more than 2
+
     if (temp->imp_lvl > temp_insert->imp_lvl)
         return 1;
     else
@@ -270,6 +282,8 @@ int priority(Node *temp, Node *temp_insert)
 }
 
 /******************* Priority function block over ********************/
+
+
 
 void insert_task_common(string deadlinedate, string deadlinetime, string type_by_user, string message, ll imp_lvl_by_user)
 {
@@ -296,12 +310,14 @@ bool compare_time_ctime_user_time(string user_date, string user_time)
 // This function to check valid deadline input from user
 {
     int year, month, date, hour, minute, seconds;
-    extractDateComponents(user_date, date, month, year);
-    extractTimeComponents(user_time, hour, minute, seconds);
+    extract_datecomponents(user_date, date, month, year);
+    extract_time_components(user_time, hour, minute, seconds);
     time_t currentTime = time(0);
     tm *ct = localtime(&currentTime); // ct= stores currenttime
 
     ll cyear = ct->tm_year + 1900, cmonth = ct->tm_mon + 1, cdate = ct->tm_mday, chour = ct->tm_hour, cminute = ct->tm_min, csecond = ct->tm_sec;
+    //Need to 1900 cause ct->tm_year returns year from 1900 , so for 2024 it returns 124 only. And in month indexing starts from 0 so need to add 1 for our conviniency
+
     // Compare year
     if (year < cyear)
         return false;
@@ -342,58 +358,67 @@ bool compare_time_ctime_user_time(string user_date, string user_time)
 
 void insert_task()
 {
-    cout << "Enter the type of task:" << endl;
+    cout<<cyan<<endl;
+    cout << "Enter the type of task:"<<colorend << endl;
     string task_type_user;
     cin.ignore(); // to ignore the newline character from the buffer
     getline(cin, task_type_user);
 
-    cout << "Enter the Integral Importance level of this task:" << endl;
+    cout <<cyan<< "Enter the Integral Importance level of this task:" <<colorend<< endl;
     ll imp_lvl_user;
     cin >> imp_lvl_user;
+   /*  while((float)(imp_lvl_user%1)!=0.000000 || imp_lvl_user<0)
+    {
+        cout<<red<<"Please enter positive integer as importance level."<<colorend<<endl;
+        cin>>imp_lvl_user;
+    } */
+
     cin.ignore(); // to ignore the newline character from the buffer
     string deadlinedate, deadlinetime, message;
 
 again: // Brings here when deadline entered is already expired
 
-    cout << "Enter the Deadline date of the task(FORMAT = DDMMYYYY):" << endl;
+    cout<<cyan << "Enter the Deadline date of the task"<<yellow<<"(FORMAT = DDMMYYYY):"<<colorend << endl;
+
     getline(cin, deadlinedate);
     int month,year,date,hour,minute,seconds;
     // This passage of code is for taking valid input of deadline DATE
     if (deadlinedate.size() != 8 || !correct_date(deadlinedate))
     {
-        cout << "Please Enter valid date in correct format" << endl;
+        cout <<red<< "Please Enter valid date in correct format." << colorend<<endl;
     }
     while (deadlinedate.size() != 8 || !correct_date(deadlinedate))
     {
         getline(cin, deadlinedate);
         if (deadlinedate.size() != 8 || !correct_date(deadlinedate)) 
         {
-            cout << "Please Enter valid date in correct format" << endl;
+            cout<<red << "Please Enter valid date in correct format." <<colorend<< endl;
         }
     }
 
-    cout << "Enter the Deadline time of the task(FORMAT = HHMMSS):" << endl;
+    cout<<cyan << "Enter the Deadline time of the task"<<yellow<<"(FORMAT = HHMMSS):"<<colorend << endl;
     getline(cin, deadlinetime);
     // This passage of code is for taking valid input of deadline DATE
     if (deadlinetime.size() != 6 || !correct_time(deadlinetime))
     {
-        cout << "Please Enter valid time in correct format" << endl;
+        cout<<red << "Please Enter valid time in correct format"<<yellow<<"(HHMMSS):"<<colorend << endl;
     }
     while (deadlinetime.size() != 6 || !correct_time(deadlinetime))
     {
         getline(cin, deadlinetime);
         if (deadlinetime.size() != 6 || !correct_time(deadlinetime))
         {
-            cout << "Please Enter valid time in correct format" << endl;
+            cout<<red << "Please Enter valid time in correct format"<<yellow<<"(HHMMSS):"<<colorend << endl;
         }
     }
 
-    if (!compare_time_ctime_user_time(deadlinedate, deadlinetime)) // if deadline is already expired
+    if (!compare_time_ctime_user_time(deadlinedate, deadlinetime)) 
+    // if deadline is already expired
     {
-        cout << "Deadline already expired. Please Enter correct deadline" << endl;
+        cout <<red<< "Deadline already expired. Please Enter correct deadline." <<colorend<<endl;
         goto again;
     }
-    cout << "Enter the message you want with the remainder:" << endl;
+    cout <<cyan<< "Enter the message you want with the remainder:"<<colorend << endl;
     getline(cin, message);
 
     transform(task_type_user.begin(), task_type_user.end(), task_type_user.begin(), ::tolower);
@@ -402,34 +427,37 @@ again: // Brings here when deadline entered is already expired
     type_task.insert(task_type_user);
 
     insert_task_common(deadlinedate, deadlinetime, task_type_user, message, imp_lvl_user);
+
+    cout<<green<<"Task Added successfully."<<colorend<<endl;
 }
 
 void print_common_list(Node *head)
 {
     ll cnt = 1;
+    cout<<yellow<<endl<<"Common Task List:"<<colorend<<endl;
     if (head->next != NULL)
     {
         Node *temp = head->next;
         cout << endl;
         while (temp != NULL)
         {
-            cout << yellow << "TASK: " << cnt++ << endl;
-            cout << "\033[0m";
-            cout << "Type: " << temp->type << endl;
-            cout << "Deadline Date: " << temp->time << endl;
-            cout << "Deadline time: " << temp->time1 << endl;
+            cout << Upurple<<endl<< "TASK:"<<colorend<<" " << cnt++<< endl;
+            cout <<cyan<< "Type: "<<colorend << colorend<<temp->type << endl;
+            cout <<cyan<< "Deadline Date: " << colorend<<temp->time << endl;
+            cout <<cyan<< "Deadline time: " << colorend<<temp->time1 << endl;
 
-            cout << "Message: " << temp->message << endl;
-            cout << "Importance level: " << temp->imp_lvl << endl;
+            cout <<cyan<<"Message: " << colorend<<temp->message << endl;
+            cout << cyan<<"Importance level: " <<colorend<< temp->imp_lvl << endl;
             temp = temp->next;
             cout << endl;
         }
 
-        cout << " ******* List over *******" << endl;
+        cout <<Bred<< "******* List Over *******"<<colorend << endl;
+        //Bred==bold red
     }
     else
     {
-        cout << "NO task in the list" << endl;
+        cout<< yellow<< "NO task in the list"<<colorend << endl;
     }
 }
 
@@ -467,7 +495,7 @@ void writeDataToFile(string username)
             {
                 message.replace(pos, 2, "@@");
             }
-            file << deadlinedate << "$#" << deadlinetime << "$#" << type << "$#" << message << "$#" << imp_lvl << '\n';
+            file << deadlinedate << "$#" << deadlinetime << "$#" << type << "$#" << message << "$#" << imp_lvl << endl;
             temp = temp->next;
         }
         file.close();
@@ -475,6 +503,7 @@ void writeDataToFile(string username)
 }
 
 // function to retrieve data from file
+
 void loadDataFromFile(string username)
 {
     string fle = username + "task_data";
@@ -484,13 +513,11 @@ void loadDataFromFile(string username)
         string line;
         while (getline(file, line))
         {
-            // Replace occurrences of "$#" with a different delimiter '|'
             size_t pos;
             while ((pos = line.find("$#")) != string::npos)
             {
-                line.replace(pos, 2, "|"); // Replace "$#" with '|'
+                line.replace(pos, 2, "|");
             }
-            // Tokenize the modified line using '|' as the delimiter
             stringstream ss(line);
             string deadlinedate, deadlinetime, type, message, imp_lvl_str;
             if (getline(ss, deadlinedate, '|') &&
@@ -499,12 +526,13 @@ void loadDataFromFile(string username)
                 getline(ss, message, '|') &&
                 getline(ss, imp_lvl_str, '|'))
             {
-                ll imp_lvl = stoll(imp_lvl_str);                                        // Convert importance level string to long long
+                ll imp_lvl=stoll(imp_lvl_str);                                        
+                // convert importance level string to long long
                 insert_task_common(deadlinedate, deadlinetime, type, message, imp_lvl); // Insert task into the linked list
             }
             else
             {
-                cout << "Invalid line in data file: " << line << endl;
+                cout<<red << "Invalid line in data file: " << line <<colorend<< endl;
             }
         }
         file.close();
@@ -520,21 +548,22 @@ void eraseFileContents(const string &filename)
     {
         file.close();
         head_common->next = NULL;
-        cout << "File contents erased successfully." << endl;
+        cout <<green<< "All Common Tasks are erased."<<colorend << endl;
     }
     else
     {
-        cerr << "Unable to open file for erasing." << endl;
+        cerr<<red << "Unable to open file for erasing."<<colorend<< endl;
     }
 }
 
 bool cmoparet2ime(Node *current, ll chour, ll cminute, ll csecond, ll cdate, ll cmonth, ll cyear)
 {
     int taskYear, taskMonth, taskDate, taskHour, taskMinute, taskSecond;
-    extractDateComponents(current->time, taskDate, taskMonth, taskYear);
-    extractTimeComponents(current->time1, taskHour, taskMinute, taskSecond);
+    extract_datecomponents(current->time, taskDate, taskMonth, taskYear);
+    extract_time_components(current->time1, taskHour, taskMinute, taskSecond);
 
-    /* cout << taskYear << " " << taskMonth << " " << taskDate << " " << taskHour << " " << taskMinute << " " << taskSecond << endl; */ // For testing
+    /* cout << taskYear << " " << taskMonth << " " << taskDate << " " << taskHour << " " << taskMinute << " " << taskSecond << endl; */ 
+    // for testing
 
     // Compare year
     if (taskYear < cyear)
@@ -633,7 +662,9 @@ void reminder_x_hr(ll rhour)
     tm *ct = localtime(&currentTime); // ct= stores currenttime
 
     ll year = ct->tm_year + 1900, month = ct->tm_mon + 1, date = ct->tm_mday, hour = ct->tm_hour, minute = ct->tm_min, second = ct->tm_sec;
-    /* cout << year << " " << month << " " << date << " " << hour << " " << minute << " " << second << endl; */ // For testing
+
+    /* cout << year << " " << month << " " << date << " " << hour << " " << minute << " " << second << endl; */
+    // For testing
     hour += rhour;
     ll excess_hour = 0;
     if (hour >= 24)
@@ -658,18 +689,19 @@ void reminder_x_hr(ll rhour)
     }
     if (excess_year)
         year++;
+
     /*  cout << year << " " << month << " " << date << " " << hour << " " << minute << " " << second << endl; */
+
     Node *temp = head_common;
     while (temp->next != NULL && !cmoparet2ime(temp->next, hour, minute, second, date, month, year))
     {
-        cout << red << "Reminder for-->" << endl;
-        cout << "\033[0m";
+        cout << Upurple<<endl<< "Reminder for-->" << endl;
         temp = temp->next;
-        cout << "Type: " << temp->type << endl;
-        cout << "Deadline Date: " << temp->time << endl;
-        cout << "Deadline Time: " << temp->time1 << endl;
-        cout << "Message: " << temp->message << endl;
-        cout << "Importance Level: " << temp->imp_lvl << endl;
+        cout <<cyan <<"Type: " <<colorend<< temp->type << endl;
+        cout << cyan<<"Deadline Date: " << temp->time << endl;
+        cout <<cyan <<"Deadline Time: "<<colorend << temp->time1 << endl;
+        cout <<cyan <<"Message: "<<colorend << temp->message << endl;
+        cout << cyan <<"Importance Level: "<<colorend << temp->imp_lvl << endl;
         cout << endl;
     }
 }
@@ -679,10 +711,10 @@ void remove_tasks(string username)
     Node *temp = head_common;
     if (is_list_empty())
     {
-        cout << "There is no task in the list." << endl;
+        cout <<red<< "There is no task in the list." <<colorend<< endl;
         return;
     }
-    cout << "Enter the task number to be removed" << endl;
+    cout <<cyan<<endl<< "Enter the task number to be removed."<<colorend << endl;
     ll k;
     cin >> k;
     ll cnt = 0;
@@ -691,9 +723,9 @@ void remove_tasks(string username)
         temp = temp->next;
         ++cnt;
     }
-    while (cnt < k || k == 0)
+    while (cnt < k || k == 0 || cnt<0)
     {
-        cout << "Enter a valid task number to be removed" << endl;
+        cout <<red<< "Enter a valid task number to be removed."<<colorend << endl;
         cin >> k;
     }
     Node *p = temp->prev;
@@ -701,7 +733,7 @@ void remove_tasks(string username)
     if (temp->next != NULL)
         temp->next->prev = p;
     delete temp;
-    cout << "Task removed ." << endl;
+    cout<<green<< "Task removed."<<colorend << endl;
     writeDataToFile(username);
 }
 
@@ -748,21 +780,19 @@ void alaram(Node *head, string username)
     while (temp != NULL && !cmoparet2ime(temp, hour, minute, second, date, month, year))
     {
         cnt = 1; // This condition is very important as it updates the next of the head_common
-        cout << yellow << "ALARAM FOR:-->" << endl;
-        cout << "\033[0m";
-        cout << "Type: " << temp->type << endl;
-        cout << "Deadline Date: " << temp->time << endl;
-        cout << "Deadline Time: " << temp->time1 << endl;
-        cout << "Message: " << temp->message << endl;
-        cout << "Importance Level: " << temp->imp_lvl << endl;
+        cout << Upurple <<endl<< "ALARAM FOR:-->" <<colorend<< endl;
+        cout<<cyan << "Type: "<<colorend << temp->type << endl;
+        cout<<cyan << "Deadline Date: "<<colorend << temp->time << endl;
+        cout <<cyan<< "Deadline Time: " <<colorend<< temp->time1 << endl;
+        cout <<cyan<< "Message: " << colorend<<temp->message << endl;
+        cout <<cyan<< "Importance Level: " << colorend<<temp->imp_lvl << endl;
         cout << endl;
         temp = temp->next;
     }
     if (cnt == 1)
     {
         head->next = temp;
-        cout << red << "completed tasks are removed" << endl;
-        cout << "\033[0m" << endl;
+        cout << green<< "completed tasks are removed"<<colorend << endl;
     }
     writeDataToFile(username);
 }
@@ -772,10 +802,10 @@ void reschedule(string username)
     Node *temp = head_common;
     if (is_list_empty())
     {
-        cout << "There is no task int the list." << endl;
+        cout <<red<< "There is no task int the list."<<colorend << endl;
         return;
     }
-    cout << "Enter the task number to be rescheduled" << endl;
+    cout << Upurple<<"Enter the task number to be rescheduled"<<colorend << endl;
     ll k;
     cin >> k;
     ll cnt = 0;
@@ -784,9 +814,9 @@ void reschedule(string username)
         temp = temp->next;
         ++cnt;
     }
-    while (cnt < k || k == 0)
+    while (cnt < k || k == 0 || cnt<0)
     {
-        cout << "Enter a valid task number to be rescheduled" << endl;
+        cout <<red<< "Enter a valid task number to be rescheduled"<<colorend << endl;
         cin.ignore(numeric_limits<streamsize>::max(), '\n');
         cin >> k;
     }
@@ -794,58 +824,59 @@ void reschedule(string username)
 
 again: // Brings here when deadline entered is already expired
 
-    cout << "Enter the Deadline date of the task(FORMAT = DDMMYYYY):" << endl;
+    cout <<cyan<< "Enter the Deadline date of the task"<<yellow<<"(FORMAT = DDMMYYYY):"<<colorend << endl;
     getline(cin, deadlinedate);
     int month,year,date,hour,minute,seconds;
     // This passage of code is for taking valid input of deadline DATE
     if (deadlinedate.size() != 8 || !correct_date(deadlinedate))
     {
-        cout << "Please Enter valid date in correct format" << endl;
+        cout << red<<"Please Enter valid date in correct format."<<colorend << endl;
     }
     while (deadlinedate.size() != 8 || !correct_date(deadlinedate))
     {
         getline(cin, deadlinedate);
         if (deadlinedate.size() != 8 || !correct_date(deadlinedate))
         {
-            cout << "Please Enter valid date in correct format" << endl;
+            cout <<red<< "Please Enter valid date in correct format."<<colorend << endl;
         }
     }
 
-    cout << "Enter the Deadline time of the task(FORMAT = HHMMSS):" << endl;
+    cout << cyan<<"Enter the Deadline time of the task"<<yellow<<"(FORMAT = HHMMSS):"<<colorend << endl;
     getline(cin, deadlinetime);
     // This passage of code is for taking valid input of deadline DATE
     if (deadlinetime.size() != 6 || !correct_time(deadlinetime))
     {
-        cout << "Please Enter valid time in correct format" << endl;
+        cout <<red<< "Please Enter valid time in correct format."<<colorend << endl;
     }
     while (deadlinetime.size() != 6 || !correct_time(deadlinetime))
     {
         getline(cin, deadlinetime);
         if (deadlinetime.size() != 6 || !correct_time(deadlinetime))
         {
-            cout << "Please Enter valid time in correct format" << endl;
+            cout << red<<"Please Enter valid time in correct format." <<colorend<< endl;
         }
     }
 
     if (!compare_time_ctime_user_time(deadlinedate, deadlinetime)) // if deadline is already expired
     {
-        cout << "Deadline already expired. Please Enter correct deadline" << endl;
+        cout<<red << "Deadline already expired. Please Enter correct deadline." << endl;
         goto again;
     }
 
     temp->time = deadlinedate;
     temp->time1 = deadlinetime;
     writeDataToFile(username);
+    cout<<green<<"Task Rescheduled"<<colorend<<endl;
 }
 
 void edit_task(string username)
 {
-    cout << "Enter the task number which you want to edit" << endl;
+    cout <<cyan<<endl<<"Enter the task number which you want to edit"<<colorend << endl;
     ll k;
     Node *temp = head_common;
     if (is_list_empty())
     {
-        cout << "There is no task in the list." << endl;
+        cout << red<<"There is no task in the list." <<colorend<< endl;
         return;
     }
     cin >> k;
@@ -855,22 +886,22 @@ void edit_task(string username)
         temp = temp->next;
         ++cnt;
     }
-    while (cnt < k || k == 0)
+    while (cnt < k || k == 0 || cnt<0)
     {
-        cout << "Enter a valid task number(Either you entered 0 or there are less task then your number)" << endl;
+        cout <<red<<"Enter a valid task number(Either you entered 0 or there are less task then your number)"<<colorend << endl;
         cin.ignore(numeric_limits<streamsize>::max(), '\n');
         cin >> k;
     }
     ll counter;
-    cout << "Enter 1 to edit task type" << endl;
-    cout << "Enter 2 to edit task importance level" << endl;
-    cout << "Enter 3 to edit task message" << endl;
-    cin >> counter; // token which tells what to edit
+    cout <<endl<< "Enter 1 to edit task type." << endl;
+    cout << "Enter 2 to edit task importance level." << endl;
+    cout << "Enter 3 to edit task message." << endl;
+    cin >> counter; 
     switch (counter)
     {
     case 1:
     {
-        cout << "Enter the new type of task:" << endl;
+        cout <<cyan<<endl<< "Enter the new type of task:"<<colorend << endl;
         string task_type_user;
         cin.ignore(numeric_limits<streamsize>::max(), '\n'); // igonres newline char
         getline(cin, task_type_user);
@@ -881,7 +912,7 @@ void edit_task(string username)
     }
     case 2:
     {
-        cout << "Enter the new importance level:" << endl;
+        cout << cyan<<endl<<"Enter the new importance level:"<<colorend << endl;
         ll task_imp_lvl;
         cin.ignore(numeric_limits<streamsize>::max(), '\n'); // igonres newline char
         cin >> task_imp_lvl;
@@ -891,7 +922,7 @@ void edit_task(string username)
     }
     case 3:
     {
-        cout << "Enter the new message:" << endl;
+        cout <<cyan<<endl<< "Enter the new message:"<<colorend << endl;
         string task_message;
         cin.ignore(numeric_limits<streamsize>::max(), '\n'); // igonres newline char
         getline(cin, task_message);
@@ -900,6 +931,7 @@ void edit_task(string username)
         break;
     }
     }
+    cout<<green<<"Task Edited"<<colorend<<endl;
 }
 
 // Daily task block
@@ -907,7 +939,7 @@ void edit_task(string username)
 bool compare_time_daily(string deadline)
 {
     int hour, minute, seconds;
-    extractTimeComponents(deadline, hour, minute, seconds);
+    extract_time_components(deadline, hour, minute, seconds);
     time_t currentTime = time(0);
     tm *ct = localtime(&currentTime); // ct= stores currenttime
 
@@ -955,22 +987,22 @@ void insert_daily(string deadlinetime, string task_type_user, string message, ll
 
 void insert_daily_task()
 {
-    cout << "Enter the type of daily task:" << endl;
+    cout<<cyan << "Enter the type of daily task:"<<colorend << endl;
     string task_type_user;
     cin.ignore(numeric_limits<streamsize>::max(), '\n'); // igonres newline char
     getline(cin, task_type_user);
-    cout << "Enter the Integral Importance level of this task:" << endl;
+    cout<<cyan << "Enter the Integral Importance level of this task:"<<colorend << endl;
     ll imp_lvl_user;
     cin >> imp_lvl_user;
     string deadlinetime, message;
 
-    cout << "Enter the time of the task(FORMAT = HHMMSS):" << endl;
+    cout <<cyan<< "Enter the time of the task(FORMAT = HHMMSS):" <<colorend<< endl;
     cin.ignore();
     getline(cin, deadlinetime);
     // This passage of code is for taking valid input of deadline DATE
     if (deadlinetime.size() != 6 || !correct_time(deadlinetime))
     {
-        cout << "Please Enter valid time in correct format" << endl;
+        cout <<red<< "Please Enter valid time in correct format"<<colorend << endl;
     }
     while (deadlinetime.size() != 6 || !correct_time(deadlinetime))
     {
@@ -978,45 +1010,44 @@ void insert_daily_task()
         getline(cin, deadlinetime);
         if (deadlinetime.size() != 6 || !correct_time(deadlinetime))
         {
-            cout << "Please Enter valid time in correct format" << endl;
+            cout<<red << "Please Enter valid time in correct format"<<colorend << endl;
         }
     }
 
-    cout << "Enter the message you want with the remainder:" << endl;
+    cout<<cyan << "Enter the message you want with the remainder:"<<colorend << endl;
     getline(cin, message);
 
     transform(task_type_user.begin(), task_type_user.end(), task_type_user.begin(), ::tolower);
 
     insert_daily(deadlinetime, task_type_user, message, imp_lvl_user);
+    cout<<green<<"Daily Task added."<<endl;
 }
 
 void display_daily()
 {
+    cout<<yellow<<endl<<"Daily-Task List:"<<endl;
     Node_daily *temp = head_daily;
     ll cnt = 1;
     if (temp->next == NULL)
     {
-        cout << "No task in daily task list." << endl;
+        cout <<red<<endl <<"No task in daily task list."<<colorend << endl;
         return;
     }
     while (temp->next != NULL)
     {
         temp = temp->next;
-        cout << endl;
-        cout << red << "TASK: " << cnt++ << endl;
-        cout << "\033[0m";
-        cout << "Type: " << temp->type << endl;
-        cout << "Impotance level: " << temp->imp_lvl << endl;
-        cout << "Time:" << temp->deadline << endl;
-        cout << "Message: " << temp->message << endl;
+        cout << Upurple<<endl<< "TASK:" <<colorend<<" "<< cnt++ << endl;
+        cout << cyan<<"Type: "<<colorend << temp->type << endl;
+        cout << cyan<<"Impotance level: " <<colorend<< temp->imp_lvl << endl;
+        cout << cyan<<"Time:"<<colorend << temp->deadline << endl;
+        cout << cyan<<"Message:"<<colorend << temp->message << endl;
     }
 }
 
 void display_incomplete_dailytask()
 {
     cout << endl;
-    cout << red << "Incomplete Daily tasks:" << endl;
-    cout << "\033[0m" << endl;
+    cout << yellow << "List of Incomplete Daily tasks:"<<colorend << endl;
     Node_daily *temp = head_daily;
     ll cnt = 1, k = 0;
     while (temp->next != NULL && !compare_time_daily(temp->next->deadline))
@@ -1027,16 +1058,15 @@ void display_incomplete_dailytask()
     {
         k = 1;
         temp = temp->next;
-        cout << yellow << "TASK: " << cnt++ << endl;
-        cout << "\033[0m" << endl;
-        cout << "Type: " << temp->type << endl;
-        cout << "Impotance level: " << temp->imp_lvl << endl;
-        cout << "Time:" << temp->deadline << endl;
-        cout << "Message: " << temp->message << endl;
+        cout << Upurple << "TASK: " <<colorend<< cnt++ << endl;
+        cout <<cyan<< "Type: "<<colorend << temp->type << endl;
+        cout <<cyan<< "Impotance level: "<<colorend << temp->imp_lvl << endl;
+        cout << cyan<<"Time:"<<colorend << temp->deadline << endl;
+        cout << cyan<<"Message: "<<colorend << temp->message << endl;
     }
     if (k == 0)
     {
-        cout << "No Incomplete daily task" << endl;
+        cout <<red<< "No Incomplete daily task"<<colorend << endl;
     }
 }
 
@@ -1045,10 +1075,10 @@ void delete_daily_task()
     Node_daily *temp = head_daily;
     if (temp->next == NULL)
     {
-        cout << "There is no task in the Daily task list." << endl;
+        cout <<red<< "There is no task in the Daily task list."<<colorend << endl;
         return;
     }
-    cout << "Enter the task number to be removed" << endl;
+    cout <<cyan<<endl<< "Enter the task number to be removed"<<colorend << endl;
     ll k;
     cin >> k;
     ll cnt = 0;
@@ -1057,9 +1087,9 @@ void delete_daily_task()
         temp = temp->next;
         ++cnt;
     }
-    while (cnt < k || k == 0)
+    while (cnt < k || k == 0 || cnt<0)
     {
-        cout << "Enter a valid task number to be removed" << endl;
+        cout <<red<< "Enter a valid task number to be removed"<<colorend << endl;
         cin >> k;
     }
     Node_daily *p = temp->prev;
@@ -1067,7 +1097,7 @@ void delete_daily_task()
     if (temp->next != NULL)
         temp->next->prev = p;
     delete temp;
-    cout << "Task removed ." << endl;
+    cout << green<<"Task removed."<<colorend << endl;
 }
 
 void write_daily_task(string username)
@@ -1116,13 +1146,11 @@ void load_daily_task_file(string username)
         string line;
         while (getline(file, line))
         {
-            // Replace occurrences of "$#" with a different delimiter '|'
             size_t pos;
             while ((pos = line.find("$#")) != string::npos)
             {
-                line.replace(pos, 2, "|"); // Replace "$#" with '|'
+                line.replace(pos, 2, "|"); 
             }
-            // Tokenize the modified line using '|' as the delimiter
             stringstream ss(line);
             string deadlinedate, deadlinetime, type, message, imp_lvl_str;
             if (getline(ss, deadlinetime, '|') &&
@@ -1130,8 +1158,8 @@ void load_daily_task_file(string username)
                 getline(ss, message, '|') &&
                 getline(ss, imp_lvl_str, '|'))
             {
-                ll imp_lvl = stoll(imp_lvl_str);                    // Convert importance level string to long long
-                insert_daily(deadlinetime, type, message, imp_lvl); // Insert task into the linked list
+                ll imp_lvl = stoll(imp_lvl_str);                    
+                insert_daily(deadlinetime, type, message, imp_lvl);
             }
         }
         file.close();
@@ -1145,11 +1173,7 @@ void erase_all_daily_task(string username)
     {
         file.close();
         head_daily->next = NULL;
-        cout << "File contents erased successfully." << endl;
-    }
-    else
-    {
-        cerr << "Unable to open file for erasing." << endl;
+        cout <<green<<"All Daily tasks removed"<<colorend<< endl;
     }
 }
 
@@ -1196,7 +1220,7 @@ void writeuser_pass(const vector<pair<string, string> > &user_pass)
     }
     else
     {
-        cout << "Unable to open file for writing." << endl;
+        cout << red<<"Unable to open file for writing."<<colorend << endl;
     }
 }
 
@@ -1236,29 +1260,39 @@ int main()
     string username, password;
     vector<pair<string, string> > user_pass;
     readuser_pass(user_pass);
-    cout << "Enter 1 to signup" << endl;
-    cout << "Enter 2 to login to your id" << endl;
-    cout << "Enter 3 to Exit" <<endl;
+    cout<<Upurple<<endl<<"Welcome to Task-Manager:"<<colorend<<endl;
+    cout<<endl;//For better visualization of output in console
+    cout<<dgray;
+    cout << "Enter 1 for Signing up for the to-do list." << endl;
+    cout << "Enter 2 to Login to your ID ." << endl;
+    cout << "Enter 3 to Exit." <<endl;
+    cout<<endl;
     int user_login;
     cin >> user_login;
     ll x = 1;
     if (user_login == 1)
     {
-        cout << "Enter the username (CASE SENSITIVE and WITHOUT SPACE):" << endl;
+        cout<<endl;
+        cout << "Enter the username ("<<underlinedgray<<"CASE SENSITIVE and WITHOUT SPACE"<<colorend<<") : " << endl;
+        cout<<dgray;
         cin >> username;
         unames.insert(username);
         while (cnt == unames.size())
         {
-            cout << "This username is not available" << endl;
+            cout<<red;
+            cout << "This username is not available. Enter any other username." << endl;
+            cout<<colorend<<endl;
             cin >> username;
             unames.insert(username);
         }
-        cout << "Enter yor 8 character password" << endl;
+        cout<<endl;
+        cout<<dgray<< "Enter yor 8 character password (Any characters)" << endl;
         {
             cin >> password;
             while (password.size() != 8)
             {
-                cout << "Enter password as mentioned above" << endl;
+                cout<<red << "Entered Password did not qualify required qualities. Please Enter Properly." <<colorend<< endl;
+                cout<<endl;
                 cin >> password;
             }
         }
@@ -1268,7 +1302,8 @@ int main()
     else if(user_login==2)
     {
     useragain:
-        cout << "Enter the username (CASE SENSITIVE and WITHOUT SPACE):" << endl;
+    cout<<endl;
+        cout <<dgray<< "Enter the username (CASE SENSITIVE and WITHOUT SPACE):" << endl;
         cin >> username;
         int condition = 0;
         for (set<string>::iterator i = unames.begin(); i != unames.end(); i++)
@@ -1281,12 +1316,12 @@ int main()
         }
         if (!condition)
         {
-            cout << "Username Does not exist. Enter again" << endl;
+            cout<<red << "Username does not exist .Please Enter valid Username." << endl;
             goto useragain;
         }
         else
         {
-            cout << "Enter password" << endl;
+            cout<<dgray <<endl<< "Enter password." << endl;
         passagain:
             cin >> password;
             ll i = 0;
@@ -1296,7 +1331,7 @@ int main()
             }
             while (i < user_pass.size() && user_pass[i].second != password)
             {
-                cout << "Wrong password , Enter again ." << endl;
+                cout<<red << "Wrong password, Enter again."<<colorend << endl;
                 goto passagain;
             }
         }
@@ -1308,7 +1343,7 @@ int main()
     writeuname(unames);
     if (user_login == 1)
     {
-        cout << username << " , Welcome to TASK MANAGER " << endl;
+        cout <<green<<endl<<"Hey! "<< username << " , Welcome to TASK MANAGER... "<<colorend << endl;
         goto skip;
     }
     load_daily_task_file(username);
@@ -1319,85 +1354,154 @@ skip:
     reminder_x_hr(12);
     while (1)
     {
-        cout << endl;
-        cout << "Enter 1 to insert a task." << endl;
-        cout << "Enter 2 to view the whole list of task." << endl;
-        cout << "Enter 3 to remove all the previous tasks" << endl;
-        cout << "Enter 4 to remove a task" << endl;
-        cout << "Enter 5 to reschedule a task" << endl;
-        cout << "Enter 6 to edit any task" << endl;
-        cout << "Enter 7 to display all daily tasks" << endl;
-        cout << "Enter 8 to insert a task as the daily task" << endl;
-        cout << "Enter 9 to delete a daily task" << endl;
-        cout << "Enter 10 to erase all daily tasks" << endl;
-        cout << "Enter 11 to exit." << endl;
+        cout <<dgray<< endl;
+        cout<<yellow<<"MAIN MENU:"<<colorend<<endl;
+        cout<<"Enter 1 to perform operations on daily tasks."<<endl;
+        cout<<"Enter 2 to perform operations on common(Non-daily) tasks."<<endl;
+        cout<<"Enter 3 to Exit"<<endl;
+        cout<<endl;
         ll y;
-        cin >> y;
-        switch (y)
+        cin>>y;
+        switch(y)
         {
-        case 1:
-        {
-            insert_task();
-            cout << endl;
-            break;
+            case 1:
+            {
+                while(1)
+                {
+                cout<<yellow<<endl<<"Daily-Task Menu:"<<colorend<<endl;
+                cout<<dgray<<endl<<"Enter 1 to Insert a Daily task."<<endl;
+                cout<<"Enter 2 to delete a Daily task."<<endl;
+                cout<<"Enter 3 to delete all Daily tasks."<<endl;
+                cout<<"Enter 4 to display all Daily tasks"<<endl;
+                cout<<"Enter 5 to return to Main Menu."<<endl;
+                cout<<endl;
+                ll daily_counter;
+                cin>>daily_counter;
+                switch(daily_counter)
+                {
+                    case 1:
+                    {
+                        insert_daily_task();
+                        break;  
+                    }
+                    case 2:
+                    {
+                        delete_daily_task();
+                        //write_daily_task(username);
+                        break;
+                    }
+                    case 3:
+                    {
+                        erase_all_daily_task(username);
+                        break;
+                    }
+                    case 4:
+                    {
+                        display_daily();
+                        break;
+                    }
+                    case 5:
+                    {
+                        goto task_switch_end;
+                    }
+                }
+                }
+            }
+            case 2:
+            {
+                while(1)
+                {
+                cout<<yellow<<endl<<"Common-Task Menu:"<<colorend<<endl;
+                cout<<dgray<<endl<<"Enter 1 to Insert a Task."<<endl;
+                cout<<"Enter 2 to delete a Task."<<endl;
+                cout<<"Enter 3 to delete all Common Tasks."<<endl;
+                cout<<"Enter 4 to View all the Common Tasks."<<endl;
+                cout<<"Enter 5 to Make some Edits in the Tasks."<<endl;
+                cout<<"Enter 6 to return to Main Menu."<<endl;
+                cout<<endl;
+                ll common_counter;
+                cin>>common_counter;
+                switch(common_counter)
+                {
+                    case 1:
+                    {
+                        insert_task();
+                        cout<<endl;
+                        break;
+                    }
+                    case 2:
+                    {
+                        remove_tasks(username);
+                        break;
+                    }
+                    case 3:
+                    {
+                        string fle = username + "task_data";
+                        eraseFileContents(fle);
+                        break;
+                    }
+                    case 4:
+                    {
+                        print_common_list(head_common);
+                        break;
+                    }
+                    case 5:
+                    {
+                        while(1)
+                        {
+                        cout<<yellow<<"Task Editing Menu:"<<colorend<<endl;
+                        cout<<dgray<<endl;
+                        cout<<"Enter 1 to Reschedule a Task."<<endl;
+                        cout<<"Enter 2 to Edit type, message, Importance level of a Task."<<endl;
+                        cout<<"Enter 3 to return to Common Task Menu."<<endl;
+                        cout<<endl;
+                        ll edit_counter;
+                        cin>>edit_counter;
+                        switch(edit_counter)
+                        {
+                            case 1:
+                            {
+                                reschedule(username);
+                                break;
+                            }
+                            case 2:
+                            {
+                                edit_task(username);
+                                break;
+                            }
+                            case 3:
+                            {
+                                goto common_end;
+                            }
+                            default:
+                            cout<<red<<endl << "Enter valid option."<<colorend << endl; 
+                        }
+                        }
+                        common_end:
+                        break;
+                    }
+                    case 6:
+                    {
+                        goto task_switch_end;
+                        ll temporary_var1=0;//to avoid label to be the last line of the block
+                    }
+                    default:
+                    cout<<red<<endl << "Enter valid option."<<colorend << endl;
+                }
+                }
+            }
+            case 3:
+            {
+                writeDataToFile(username);
+                write_daily_task(username);
+                cout<<yellow<<endl<<"Have a Nice Day !"<<colorend<<endl;
+                goto end;
+            }
+            default:
+            cout<<red<<endl << "Enter valid option."<<colorend << endl;
         }
-        case 2:
-        {
-            print_common_list(head_common);
-            break;
-        }
-        case 3:
-        {
-            string fle = username + "task_data";
-            eraseFileContents(fle);
-            break;
-        }
-        case 4:
-        {
-            remove_tasks(username);
-            break;
-        }
-        case 5:
-        {
-            reschedule(username);
-            break;
-        }
-        case 6:
-        {
-            edit_task(username);
-            break;
-        }
-        case 7:
-        {
-            display_daily();
-            break;
-        }
-        case 8:
-        {
-            insert_daily_task();
-            break;
-        }
-        case 9:
-        {
-            delete_daily_task();
-            write_daily_task(username);
-            break;
-        }
-        case 10:
-        {
-            erase_all_daily_task(username);
-            break;
-        }
-        case 11:
-        {
-            writeDataToFile(username);
-            write_daily_task(username);
-            goto end;
-            break;
-        }
-        default:
-            cout << "Enter valid option." << endl;
-        }
+        task_switch_end:
+        ll temporary_var2=0;//to avoid label to be the last line of the block
     }
 end:
     x = 0;
