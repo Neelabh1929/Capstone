@@ -1,0 +1,735 @@
+#include <windows.h>
+#include<winuser.h>
+#include<bits/stdc++.h>
+#include<sys/stat.h>
+#include<sys/types.h>
+#include<time.h>
+#include<math.h>
+#include<string.h>
+#include<stdbool.h>
+#include<stdlib.h>
+#include<dirent.h>
+#include<iostream>
+using namespace std;
+
+class Date;
+class Time;
+class Task;
+class Date
+{
+	private:
+		int DD;
+		int MM;
+		int YYYY;
+	public:
+		Date(int t_year,int t_mon,int t_day)
+		{
+			DD=t_day;
+			MM=t_mon;
+			YYYY=t_year;
+		}
+		char* ShowDateStr()//used for creating file which stores all the times and task
+		{
+			char date[9];
+			int a=DD;
+			for(int i=1;i>=0;i--)
+			{
+				date[i]=(a%10)+48;
+				a=a/10;
+				
+			}
+			int b=MM;
+			for(int i=3;i>=2;i--)
+			{
+				date[i]=(b%10)+48;
+				b=b/10;
+				
+			}
+			int c=YYYY;
+			for(int i=7;i>=4;i--)
+			{
+				date[i]=(c%10)+48;
+				c=c/10;
+				
+			}
+			date[8]=0;
+			return date;
+		}
+		//friend bool Compare(Date A,Date B,Time C,Time D);
+		//friend void TaskTaker(Date A,Time B);
+};
+
+class Time
+{
+	private:
+		int HH;
+		int MM;
+		int SS;
+	public:
+		Time(int t_hour,int t_min,int t_sec)
+		{
+			HH=t_hour;
+			MM=t_min;
+			SS=t_sec;
+		}
+		char* ShowTimeStr()//used in file
+		{
+			char s[7];
+			int i=0,b,c,d;
+			b=SS;
+			c=MM;
+			d=HH;
+			for(i=5;i>=4;i--)
+			{
+				s[i]=(b%10)+48;
+				b=b/10;
+			}
+			for(i=3;i>=2;i--)
+			{
+				s[i]=(c%10)+48;
+				c=c/10;
+			}
+			for(i=1;i>=0;i--)
+			{
+				s[i]=(d%10)+48;
+				d=d/10;
+			}
+			s[6]=0;
+			return s;
+		}
+		//friend bool Compare(Date A,Date B,Time C,Time D);
+		//friend void TaskTaker(Date A,Time B);
+};
+
+class Head;
+class Node;
+
+class Task
+{
+	public:
+		int priority;
+		char task[50];
+		bool Linked=false;
+		char date[9];
+		char time1[7];//time is a function maychange it if causes further problems
+		bool taskDone=false;
+		bool ExeStat=false;
+	public:
+		Task(int p,char t[50],bool L,char d[9],char l[7],bool tD,bool eS)
+		{
+			priority=p;
+			strcpy(task,t);
+			Linked=L;
+			strcpy(date,d);
+			strcpy(time1,l);
+			taskDone=tD;
+			ExeStat=eS;
+		}
+    	//friend void CreateTask();
+		//friend bool ShowTask();
+		friend void Push(Task Q,Head* H,int counter);
+		friend char* Show(Head *H);
+		friend void PopFront(Head* H);
+};
+class Head
+{
+	public:
+		int size=0;
+		Node* Front=NULL;
+		Node* Rear=NULL;
+	public:
+		friend void Push(Task Q,Head* H,int counter);
+		friend char* Show(Head *H);
+		//friend void ShowDet(Task Q);
+		friend void PopFront(Head* H);
+};
+
+class Node
+{
+	public:
+		Task P;
+		Node* next=NULL;
+	public:
+		friend void Push(Task Q,Head* H,int counter);
+		friend char* Show(Head *H);
+		//friend void ShowDet(Task Q);
+		friend void PopFront(Head* H);
+};
+
+void Push(Task Q,Head* H,int counter)//we can add a counter to see how many times the function is called to the function
+{
+	Node *a;
+	a=(Node*)malloc(sizeof(Node));
+	if(a==NULL)
+	{
+		cout<<"Empty"<<endl;
+	}
+	a->P=Q;
+	int b;
+	b=a->P.priority;
+	Node* tmp;
+	tmp=H->Rear;
+	if(counter!=0)
+	{
+	    a->next=tmp;
+	    int i=1;
+	    for(i=1;i<=H->size;i++)//here is the problem
+	    {
+	    	if(!(b<(tmp->P.priority)))//problem is it shouldnt run first if statement the first time otherwise it will accesss undefined memory
+	    	{
+	    		break;//think this is the problem 
+	    		
+			}
+			a->next=tmp;
+			tmp=tmp->next;
+			
+		}
+		
+		if(i==1)
+		{
+			H->Rear=a;
+		}
+		else if(i==(H->size)+1)
+		{
+			H->Front=a;
+			(a->next)->next=a;
+			a->next=NULL;
+		}
+		else
+		{
+			(a->next)->next=a;
+			a->next=tmp;
+		}
+	}
+	else if(counter==0)
+	{
+		H->size=0;
+		H->Rear=a;
+		H->Front=a;
+	}
+	H->size=(H->size)+1;
+}
+
+char* Show(Head* H)
+{
+	Node* tmp;
+	tmp=H->Front;
+	char e[50]=" ";
+	if(tmp->P.Linked)
+	{
+		char file[32];
+		file[0]=0;
+		strcat(file,"C:/Schedule/");
+		strcat(file,tmp->P.date);
+		strcat(file,"/");
+		strcat(file,tmp->P.time1);
+		strcat(file,".txt");
+		cout<<file<<endl;
+		FILE *W;
+		char tas[50];
+		int c;
+		bool eS=false;
+		W=fopen(file,"r");
+		
+		fscanf(W,"%d",&c);
+		fscanf(W,"%s",tas);
+		fscanf(W,"%d",&c);
+		fscanf(W,"%s",tas);
+		fscanf(W,"%s",tas);
+		fscanf(W,"%d",&c);
+		fscanf(W,"%d",&c);
+		eS=(bool)c;
+		tmp->P.taskDone=(bool)c;
+		
+		fclose(W);
+		if(tmp->P.taskDone)
+		{
+			strcpy(e,tmp->P.task);
+		}
+		/*else
+		{
+			strcpy(e,"Linked Task not executed");
+		}*/
+	}
+	else
+	{
+		strcpy(e,tmp->P.task);
+	}
+	int u=strlen(e);
+	while(u<50)
+	{
+		e[u]=' ';
+		u++;
+	}
+	e[49]=0;
+	return e;
+}
+
+void PopFront(Head* H)//create new pop function
+{
+	Node* tmp;
+	tmp=H->Rear;
+	if(H->size!=1)
+	{
+		for(int i=0;i<H->size-2;i++)//here is the problem
+		{
+			tmp=tmp->next;
+		}
+		H->Front=tmp;
+		Node* buf;
+		buf=tmp->next;
+		free(buf);
+		tmp->next=NULL;
+	}
+	else
+	{
+		free(tmp);
+		H->Rear=NULL;
+		H->Front=NULL;
+	}
+	H->size=H->size-1;
+}
+
+#define ID_DD 1
+#define ID_MM 3
+#define ID_YYYY 5
+#define ID_hh 6
+#define ID_mm 7
+#define ID_ss 8
+#define ID_AddTask 2
+#define ID_TaskType 4
+#define ID_TaskPriority 9
+#define ID_L 10
+#define ID_lDD 11
+#define ID_lMM 12
+#define ID_lYYYY 13
+#define ID_lhh 14
+#define ID_lmm 15
+#define ID_lss 16
+#define ID_TASK 17
+#define ID_ShowTask 18
+#define ID_ShowingTask 19
+#define ID_DeleteTask 20
+#define ID_dDD 21
+#define ID_dMM 22
+#define ID_dYYYY 23
+#define ID_dhh 24
+#define ID_dmm 25
+#define ID_dss 26
+#define ID_DStat 27
+#define ID_Reminder 28
+#define ID_ShowRem 29
+#define ID_rDD 30
+#define ID_rMM 31
+#define ID_rYYYY 32
+static HWND hwndTask;
+static HWND hwndTaskType;
+static HWND hwndSTask;
+static HWND hwndDStat;
+static HWND hwndSRem;
+/* This is where all the input to the window goes to */
+LRESULT CALLBACK WndProc(HWND hwnd, UINT Message, WPARAM wParam, LPARAM lParam) {
+	switch(Message) {
+		
+		case WM_CREATE:{
+			CreateWindow(TEXT("BUTTON"),TEXT("Add Task"),WS_VISIBLE|WS_CHILD,10,10,80,20,hwnd,(HMENU) ID_AddTask,NULL,NULL);
+			CreateWindow(TEXT("EDIT"),TEXT("DD"),WS_VISIBLE|WS_CHILD|WS_BORDER,100,10,30,30,hwnd,(HMENU) ID_DD,NULL,NULL);
+			CreateWindow(TEXT("EDIT"),TEXT("MM"),WS_VISIBLE|WS_CHILD|WS_BORDER,150,10,30,30,hwnd,(HMENU) ID_MM,NULL,NULL);
+			CreateWindow(TEXT("EDIT"),TEXT("YYYY"),WS_VISIBLE|WS_CHILD|WS_BORDER,200,10,40,30,hwnd,(HMENU) ID_YYYY,NULL,NULL);
+			CreateWindow(TEXT("EDIT"),TEXT("HH"),WS_VISIBLE|WS_CHILD|WS_BORDER,250,10,30,30,hwnd,(HMENU) ID_hh,NULL,NULL);
+			CreateWindow(TEXT("EDIT"),TEXT("MM"),WS_VISIBLE|WS_CHILD|WS_BORDER,300,10,30,30,hwnd,(HMENU) ID_mm,NULL,NULL);
+			CreateWindow(TEXT("EDIT"),TEXT("SS"),WS_VISIBLE|WS_CHILD|WS_BORDER,350,10,30,30,hwnd,(HMENU) ID_ss,NULL,NULL);
+			hwndTaskType=CreateWindow(TEXT("EDIT"),TEXT("Task Type"),WS_VISIBLE|WS_CHILD|WS_BORDER,100,50,100,30,hwnd,(HMENU) ID_TaskType,NULL,NULL);
+			CreateWindow(TEXT("EDIT"),TEXT("Priority"),WS_VISIBLE|WS_CHILD|WS_BORDER,210,50,100,30,hwnd,(HMENU) ID_TaskPriority,NULL,NULL);
+			CreateWindow(TEXT("EDIT"),TEXT("Linked"),WS_VISIBLE|WS_CHILD|WS_BORDER,340,50,100,30,hwnd,(HMENU) ID_L,NULL,NULL);
+			hwndTask=CreateWindow(TEXT("EDIT"),TEXT("Task"),WS_VISIBLE|WS_CHILD|WS_BORDER,450,50,100,30,hwnd,(HMENU) ID_TASK,NULL,NULL);
+			CreateWindow(TEXT("EDIT"),TEXT("DD"),WS_VISIBLE|WS_CHILD|WS_BORDER,100,100,30,30,hwnd,(HMENU) ID_lDD,NULL,NULL);
+			CreateWindow(TEXT("EDIT"),TEXT("MM"),WS_VISIBLE|WS_CHILD|WS_BORDER,150,100,30,30,hwnd,(HMENU) ID_lMM,NULL,NULL);
+			CreateWindow(TEXT("EDIT"),TEXT("YYYY"),WS_VISIBLE|WS_CHILD|WS_BORDER,200,100,40,30,hwnd,(HMENU) ID_lYYYY,NULL,NULL);
+			CreateWindow(TEXT("EDIT"),TEXT("HH"),WS_VISIBLE|WS_CHILD|WS_BORDER,250,100,30,30,hwnd,(HMENU) ID_lhh,NULL,NULL);
+			CreateWindow(TEXT("EDIT"),TEXT("MM"),WS_VISIBLE|WS_CHILD|WS_BORDER,300,100,30,30,hwnd,(HMENU) ID_lmm,NULL,NULL);
+			CreateWindow(TEXT("EDIT"),TEXT("SS"),WS_VISIBLE|WS_CHILD|WS_BORDER,350,100,30,30,hwnd,(HMENU) ID_lss,NULL,NULL);
+			CreateWindow(TEXT("BUTTON"),TEXT("Show Task"),WS_VISIBLE|WS_CHILD,10,140,80,20,hwnd,(HMENU) ID_ShowTask,NULL,NULL);
+			hwndSTask=CreateWindow(TEXT("EDIT"),TEXT("TASK"),WS_VISIBLE|WS_CHILD|ES_MULTILINE|WS_VSCROLL|ES_AUTOVSCROLL,100,140,250,30,hwnd,(HMENU) ID_ShowingTask,NULL,NULL);
+			CreateWindow(TEXT("BUTTON"),TEXT("DELETE"),WS_VISIBLE|WS_CHILD|WS_BORDER,10,180,60,20,hwnd,(HMENU) ID_DeleteTask,NULL,NULL);
+			CreateWindow(TEXT("EDIT"),TEXT("DD"),WS_VISIBLE|WS_CHILD|WS_BORDER,100,180,30,30,hwnd,(HMENU) ID_dDD,NULL,NULL);
+			CreateWindow(TEXT("EDIT"),TEXT("MM"),WS_VISIBLE|WS_CHILD|WS_BORDER,150,180,30,30,hwnd,(HMENU) ID_dMM,NULL,NULL);
+			CreateWindow(TEXT("EDIT"),TEXT("YYYY"),WS_VISIBLE|WS_CHILD|WS_BORDER,200,180,40,30,hwnd,(HMENU) ID_dYYYY,NULL,NULL);
+			CreateWindow(TEXT("EDIT"),TEXT("HH"),WS_VISIBLE|WS_CHILD|WS_BORDER,250,180,30,30,hwnd,(HMENU) ID_dhh,NULL,NULL);
+			CreateWindow(TEXT("EDIT"),TEXT("MM"),WS_VISIBLE|WS_CHILD|WS_BORDER,300,180,30,30,hwnd,(HMENU) ID_dmm,NULL,NULL);
+			CreateWindow(TEXT("EDIT"),TEXT("SS"),WS_VISIBLE|WS_CHILD|WS_BORDER,350,180,30,30,hwnd,(HMENU) ID_dss,NULL,NULL);
+			hwndDStat=CreateWindow(TEXT("EDIT"),TEXT("Execution Status"),WS_VISIBLE|WS_CHILD|WS_BORDER,400,180,120,30,hwnd,(HMENU) ID_DStat,NULL,NULL);
+			CreateWindow(TEXT("BUTTON"),TEXT("Reminder"),WS_VISIBLE|WS_CHILD|WS_BORDER,10,230,80,20,hwnd,(HMENU) ID_Reminder,NULL,NULL);
+			hwndSRem=CreateWindow(TEXT("EDIT"),TEXT("Remind Task"),WS_VISIBLE|WS_CHILD|WS_BORDER|ES_MULTILINE|WS_VSCROLL|ES_AUTOVSCROLL,270,230,250,30,hwnd,(HMENU) ID_ShowRem,NULL,NULL);
+			CreateWindow(TEXT("EDIT"),TEXT("DD"),WS_VISIBLE|WS_CHILD|WS_BORDER,100,230,30,30,hwnd,(HMENU) ID_rDD,NULL,NULL);
+			CreateWindow(TEXT("EDIT"),TEXT("MM"),WS_VISIBLE|WS_CHILD|WS_BORDER,150,230,30,30,hwnd,(HMENU) ID_rMM,NULL,NULL);
+			CreateWindow(TEXT("EDIT"),TEXT("YYYY"),WS_VISIBLE|WS_CHILD|WS_BORDER,200,230,40,30,hwnd,(HMENU) ID_rYYYY,NULL,NULL);
+			break;
+		}
+		
+		case WM_COMMAND:{
+			if(LOWORD(wParam)==ID_AddTask)
+			{
+				int a,b,c;
+				a=(int)GetDlgItemInt(hwnd,ID_YYYY,NULL,FALSE);
+				b=(int)GetDlgItemInt(hwnd,ID_MM,NULL,FALSE);
+				c=(int)GetDlgItemInt(hwnd,ID_DD,NULL,FALSE);
+				Date A(a,b,c);
+				a=(int)GetDlgItemInt(hwnd,ID_hh,NULL,FALSE);
+				b=(int)GetDlgItemInt(hwnd,ID_mm,NULL,FALSE);
+				c=(int)GetDlgItemInt(hwnd,ID_ss,NULL,FALSE);
+				Time B(a,b,c);
+				char str[50];//this is task
+				GetWindowText(hwndTask,str,50);
+				int pri;//this is priority
+				char s[12];
+				GetWindowText(hwndTaskType,s,12);
+				if(strcmp(s,"Medical")==0)
+				{
+					pri=1;
+				}
+				else if(strcmp(s,"Financial")==0)
+				{
+					pri=2;
+				}
+				else if(strcmp(s,"Educational")==0)
+				{
+					pri=3;
+				}
+				else if(strcmp(s,"Other")==0)
+				{
+					pri=(int)GetDlgItemInt(hwnd,ID_TaskPriority,NULL,FALSE);
+				}
+				bool L;
+				char d[9],l[7];
+				L=(bool)GetDlgItemInt(hwnd,ID_L,NULL,FALSE);
+				if(L)
+				{
+					a=(int)GetDlgItemInt(hwnd,ID_lYYYY,NULL,FALSE);
+					b=(int)GetDlgItemInt(hwnd,ID_lMM,NULL,FALSE);
+					c=(int)GetDlgItemInt(hwnd,ID_lDD,NULL,FALSE);
+					Date C(a,b,c);
+					a=(int)GetDlgItemInt(hwnd,ID_lhh,NULL,FALSE);
+					b=(int)GetDlgItemInt(hwnd,ID_lmm,NULL,FALSE);
+					c=(int)GetDlgItemInt(hwnd,ID_lss,NULL,FALSE);
+					Time D(a,b,c);
+					strcpy(d,C.ShowDateStr());
+					strcpy(l,D.ShowTimeStr());
+				}
+				else
+				{
+					for(int i=0;i<8;i++)
+					{
+						if(i<6)
+						{
+							d[i]='N';
+							l[i]='N';
+						}
+						else
+						{
+							d[i]='N';
+						}
+					}
+					d[8]=0;
+					l[6]=0;
+				}
+				Task E(pri,str,L,d,l,false,false);
+				char g[32];
+				g[0]=0;
+				strcat(g,"C:/Schedule/");
+				strcat(g,A.ShowDateStr());
+				mkdir("C:/Schedule");
+				mkdir(g);
+				strcat(g,"/");
+				strcat(g,B.ShowTimeStr());
+				strcat(g,".txt");
+				MessageBox(hwnd,g,"Address",MB_OK);
+				FILE* f;
+				f=fopen(g,"a");
+				fprintf(f,"%d %s %d %s %s %d %d\n",E.priority,E.task,E.Linked,E.date,E.time1,E.taskDone,E.ExeStat);
+				fclose(f);
+			}
+			else if(LOWORD(wParam)==ID_ShowTask)
+			{
+				char sr[500]; 
+				sr[0]=0;//we will need to "            "this many spaces between 17
+				time_t t=time(NULL);
+				struct tm *date;
+				date=localtime(&t);
+				int t_year,t_mon,t_day,t_hour,t_min,t_sec;
+				t_year=date->tm_year+1900;
+				t_mon=date->tm_mon+1;
+				t_day=date->tm_mday;
+				t_hour=date->tm_hour;
+				t_min=date->tm_min;
+				t_sec=date->tm_sec;
+				Date D(t_year,t_mon,t_day);
+				int a=(3600*t_hour)+(60*t_min)+t_sec;
+				int m=0;
+				for(int n=0;n<=200;n++)
+				{
+					int b=a;
+					t_sec=b%60;
+					b=b/60;
+					t_min=b%60;
+					b=b/60;
+					t_hour=b%60;
+					a++;
+					Time T(t_hour,t_min,t_sec);
+					char* str;
+					str=D.ShowDateStr();
+					char d[32];
+					d[0]=0;
+					strcat(d,"C:/Schedule/");
+					strcat(d,str);
+					strcat(d,"/");
+					str=T.ShowTimeStr();
+					strcat(d,str);
+					strcat(d,".txt");
+					FILE *f;
+					f=fopen(d,"r");
+					if(f!=NULL)
+					{
+						//cout<<"File is not empty"<<endl;  
+						FILE* tp;
+						tp=fopen("tmp.txt","a");
+						Head* H;//segmentation fault!
+						H=(Head*)malloc(sizeof(Head));
+						if(H==NULL)
+						{
+							cout<<"No Memory left"<<endl;
+						}
+						int j=0;
+						char t[50],da[9],l[7];
+						int h=0;
+						bool L,tD,eS;
+						int a,b,c;
+						while(fscanf(f,"%d",&h)!=EOF)
+						{
+							fscanf(f,"%s",t);
+							fscanf(f,"%d",&a);
+							L=(bool)a;
+							fscanf(f,"%s",da);
+							fscanf(f,"%s",l);
+							fscanf(f,"%d",&b);
+							tD=(bool)b;
+							fscanf(f,"%d",&c);
+							eS=(bool)c;
+							Task Q(h,t,L,da,l,tD,eS);
+							Push(Q,H,j);//here is the problem
+							fprintf(tp,"%d %s %d %s %s %d %d\n",h,t,L,da,l,tD,1);
+							j++;
+						}
+						fclose(tp);
+						fclose(f);
+						
+						tp=fopen("tmp.txt","r");
+						f=fopen(d,"w");
+						for(int k=0;k<j;k++)
+						{	
+							fscanf(tp,"%d",&h);
+							fscanf(tp,"%s",t);
+							fscanf(tp,"%d",&a);
+							L=(bool)a;
+							fscanf(tp,"%s",da);
+							fscanf(tp,"%s",l);
+							fscanf(tp,"%d",&b);
+							tD=(bool)b;
+							fscanf(tp,"%d",&c);
+							eS=(bool)c;
+							fprintf(f,"%d %s %d %s %s %d %d\n",h,t,L,da,l,tD,1);
+							strcat(sr,Show(H));
+							
+							//SetDlgItemText(hwnd,ID_ShowingTask,sr);
+							PopFront(H);
+						}
+						fclose(f);
+						fclose(tp);
+						
+						remove("tmp.txt");
+						free(H);
+						m++;
+					}
+					else
+					{
+						fclose(f);
+					}
+				}
+				MessageBox(hwndSTask,sr,"Task",MB_OK);
+				SetDlgItemText(hwnd,ID_ShowingTask,sr);
+				// A way to show user the text which contains task
+			}
+			else if(LOWORD(wParam)==ID_DeleteTask)
+			{
+				int a,b,c;
+				a=(int)GetDlgItemInt(hwnd,ID_dYYYY,NULL,FALSE);
+				b=(int)GetDlgItemInt(hwnd,ID_dMM,NULL,FALSE);
+				c=(int)GetDlgItemInt(hwnd,ID_dDD,NULL,FALSE);
+				Date G(a,b,c);
+				a=(int)GetDlgItemInt(hwnd,ID_dhh,NULL,FALSE);
+				b=(int)GetDlgItemInt(hwnd,ID_dmm,NULL,FALSE);
+				c=(int)GetDlgItemInt(hwnd,ID_dss,NULL,FALSE);
+				Time H(a,b,c);
+				char g[32];
+				g[0]=0;
+				strcat(g,"C:/Schedule/");
+				strcat(g,G.ShowDateStr());
+				mkdir("C:/Schedule");
+				mkdir(g);
+				strcat(g,"/");
+				strcat(g,H.ShowTimeStr());
+				strcat(g,".txt");
+				FILE* f = fopen(g, "r");
+			    if (f != NULL)
+				{
+			        fclose(f);
+			        if (remove(g) != 0) 
+					{
+			            MessageBox(hwndDStat,"Error deleting File","FileError",MB_OK);
+			            SetDlgItemText(hwnd,ID_DStat,"Failed");
+			        } 
+					else 
+					{
+			            SetDlgItemText(hwnd,ID_DStat,"Successful");
+			        }
+			    } 
+				else 
+				{
+					fclose(f);
+			        MessageBox(hwnd,"No Such Task with this date or time exist","FileError",MB_OK);
+			        SetDlgItemText(hwnd,ID_DStat,"Failed");
+			    }
+			}
+			else if(LOWORD(wParam)==ID_Reminder)
+			{
+				char sr[500]="";
+				sr[0]=0;
+				int x,y,z;
+				x=(int)GetDlgItemInt(hwnd,ID_rYYYY,NULL,FALSE);
+				y=(int)GetDlgItemInt(hwnd,ID_rMM,NULL,FALSE);
+				z=(int)GetDlgItemInt(hwnd,ID_rDD,NULL,FALSE);
+				Date C(x,y,z);
+				char g[32];
+				g[0]=0;
+				strcat(g,"C:/Schedule/");
+				strcat(g,C.ShowDateStr());
+			    DIR *dir;
+			    struct dirent *entry;
+			    char *directoryPath =  g; 
+			
+			    dir = opendir(directoryPath);
+			    if (dir == NULL)
+				{
+			     	MessageBox(hwndSRem,"No such Task Date Exist","Error",MB_OK); 
+			    }
+			    else
+				{
+					while ((entry = readdir(dir)) != NULL)
+					{
+			        	char filePath[32];
+				        strcpy(filePath, directoryPath);
+				        strcat(filePath, "/");
+				        strcat(filePath, entry->d_name);
+				
+				        FILE *file = fopen(filePath, "r");
+				        if (file) 
+						{
+							Head* H;//segmentation fault!
+							H=(Head*)malloc(sizeof(Head));
+							int j=0;
+							char t[50],da[9],l[7];
+							int h=0;
+							bool L,tD,eS;
+							int a,b,c;
+							while(fscanf(file,"%d",&h)!=EOF)
+							{
+								fscanf(file,"%s",t);
+								fscanf(file,"%d",&a);
+								L=(bool)a;
+								fscanf(file,"%s",da);
+								fscanf(file,"%s",l);
+								fscanf(file,"%d",&b);
+								tD=(bool)b;
+								fscanf(file,"%d",&c);
+								eS=(bool)c;
+								Task Q(h,t,L,da,l,tD,eS);
+								Push(Q,H,j);//here is the problem
+								j++;
+							}
+							fclose(file);
+							for(int k=0;k<j;k++)
+							{
+								strcat(sr,Show(H));
+								PopFront(H);
+							}
+							free(H);            
+			    		}
+			    	}
+				}
+			    closedir(dir);
+			    SetDlgItemText(hwnd,ID_ShowRem,sr); 
+			}
+			break;
+		}
+		
+		/* Upon destruction, tell the main thread to stop */
+		case WM_DESTROY: {
+			PostQuitMessage(0);
+			break;
+		}
+		
+		/* All other messages (a lot of them) are processed using default procedures */
+		default:
+			return DefWindowProc(hwnd, Message, wParam, lParam);
+	}
+	return 0;
+}
+
+/* The 'main' function of Win32 GUI programs: this is where execution starts */
+int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nCmdShow) {
+	WNDCLASSEX wc; /* A properties struct of our window */
+	HWND hwnd; /* A 'HANDLE', hence the H, or a pointer to our window */
+	MSG msg; /* A temporary location for all messages */
+
+	/* zero out the struct and set the stuff we want to modify */
+	memset(&wc,0,sizeof(wc));
+	wc.cbSize		 = sizeof(WNDCLASSEX);
+	wc.lpfnWndProc	 = WndProc; /* This is where we will send messages to */
+	wc.hInstance	 = hInstance;
+	wc.hCursor		 = LoadCursor(NULL, IDC_ARROW);
+	
+	/* White, COLOR_WINDOW is just a #define for a system color, try Ctrl+Clicking it */
+	wc.hbrBackground = (HBRUSH)(COLOR_WINDOW+1);
+	wc.lpszClassName = "WindowClass";
+	wc.hIcon		 = LoadIcon(NULL, IDI_APPLICATION); /* Load a standard icon */
+	wc.hIconSm		 = LoadIcon(NULL, IDI_APPLICATION); /* use the name "A" to use the project icon */
+
+	if(!RegisterClassEx(&wc)) {
+		MessageBox(NULL, "Window Registration Failed!","Error!",MB_ICONEXCLAMATION|MB_OK);
+		return 0;
+	}
+
+	hwnd = CreateWindowEx(WS_EX_CLIENTEDGE,"WindowClass","Caption",WS_VISIBLE|WS_OVERLAPPEDWINDOW,
+		CW_USEDEFAULT, /* x */
+		CW_USEDEFAULT, /* y */
+		640, /* width */
+		480, /* height */
+		NULL,NULL,hInstance,NULL);
+
+	if(hwnd == NULL) {
+		MessageBox(NULL, "Window Creation Failed!","Error!",MB_ICONEXCLAMATION|MB_OK);
+		return 0;
+	}
+
+	/*
+		This is the heart of our program where all input is processed and 
+		sent to WndProc. Note that GetMessage blocks code flow until it receives something, so
+		this loop will not produce unreasonably high CPU usage
+	*/
+	while(GetMessage(&msg, NULL, 0, 0) > 0) { /* If no error is received... */
+		TranslateMessage(&msg); /* Translate key codes to chars if present */
+		DispatchMessage(&msg); /* Send it to WndProc */
+	}
+	return msg.wParam;
+}
+
