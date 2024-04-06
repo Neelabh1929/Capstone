@@ -68,9 +68,9 @@
     box-sizing: border-box;
 }
 
-/* ::-webkit-scrollbar {
+::-webkit-scrollbar {
     width: 0;
-} */
+}
 
 body {
     min-height: 100vh;
@@ -137,12 +137,12 @@ body {
     padding: 0 30px;
 }
 
-.menu-btn {
+/* .menu-btn {
     display: inline;
     font-size: 2rem;
     cursor: pointer;
     color: #303030;
-}
+} */
 
 .welcome {
     display: flex;
@@ -376,36 +376,71 @@ body {
     color: red;
     background-color: rgba(0, 0, 0, 0.1);
 }
-
-.add-task-btn {
-    position: absolute;
-    bottom: 1rem;
-    right: 1rem;
-    width: 5rem;
-    height: 4rem;
-    font-size: 3rem;
+.menu-btn {
+    display: inline-block;
+    font-size: 2rem;
+    cursor: pointer;
+    color: #8fd248;
+    font-size: 2rem;
+    font-weight: 700;
     border-radius: 50%;
     cursor: pointer;
     display: flex;
-    align-items: center;
-    justify-content: center;
-    color: #1940dc;
+    align-items: center; 
+    /* justify-content: center; */
+    color: #112c1b;
     transition: all 0.2s;
+} 
+
+.add-task-btn {
+    position: absolute;
+    display: inline-block;
+    bottom: 1rem;
+    right: 3rem;
+    width: 5rem;
+    height: 5rem;
+    font-size: 0.8rem;
+    font-weight: 700;
+    border-radius: 50%;
+    cursor: pointer;
+    display: flex;
+    align-items: center; 
+    
+    color: #112c1b;
+    transition: all 0.3s;
+    
 }
 
-.add-task-btn.active {
-    z-index: 1;
-    bottom: 20rem;
-    transform: rotate(45deg);
+.tooltext{
+    visibility: hidden;
+   
+
+}
+.tooltext2{
+    visibility: hidden;
+    font-size: 0.8rem;
+}
+
+.add-task-btn:hover .tooltext{
+    visibility: visible;
+}
+.menu-btn:hover .tooltext2{
+    visibility: visible;
+    
+    
 }
 
 .add-task-btn:hover {
-    transform: scale(1.1);
-}
+    transform: scale(1.5);
 
+}
+.menu-btn:hover {
+    transform: scale(1.07);
+
+}
 .add-task-btn i {
     width: 2rem;
-    color: #303030;
+    color: #bf1f1f;
 }
 
 .add-task {
@@ -474,7 +509,7 @@ body {
 }
 
 .btns button.add-btn {
-    background-color: #a0d3d3;
+    background-color: #34ca61;
     color: #303030;
 }
 
