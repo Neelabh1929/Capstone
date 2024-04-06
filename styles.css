@@ -356,7 +356,8 @@ body {
 
 .task-wrapper .delete {
     min-width: 2rem;
-    height: 2rem;
+    width:3rem;
+    height: 3rem;
     padding: 0.5rem;
     border-radius: 50%;
     color: #e76060;
@@ -373,7 +374,7 @@ body {
 }
 
 .task-wrapper .delete:hover {
-    color: red;
+    
     background-color: rgba(0, 0, 0, 0.1);
 }
 .menu-btn {
