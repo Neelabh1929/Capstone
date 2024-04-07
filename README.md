@@ -7,6 +7,9 @@ Contributors:
 * sohamMevada (Soham Mevada)
 * akshatbhatt51 (Akshat Bhatt)
 
+
+GUI LINK:  https://atikdagu.github.io/todoweb/
+
 This Repo. is for the CAPSTONE project (IT-205) of team ASAN.
 
 Our Project aims to make a application that manages tasks and schedules, using data structures to
@@ -35,7 +38,7 @@ Contributions:
 (In Implementation using Linked List)
 >Class: Node,Node_daily.
 
->Functions:Functions of insertion,deletion,printing list and their subfunctions,reminder,alaram,
+>Functions:Functions of insertion,deletion,printing list and their subfunctions,reminder,alarm,
  edit_task.
 
 >Blocks/feature: Daily task Block,username and password feature.
