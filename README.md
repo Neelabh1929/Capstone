@@ -49,7 +49,7 @@ Contributions:
 >Class:task,date,time.
 >Sub Functions: priority queue , comparator.
 >Functions: create task , show task.
->GUI: Windows App.
+>GUI: TaskManager App.
 
 * Akshat Bhatt:
 (In implementation using tables)
