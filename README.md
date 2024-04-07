@@ -34,25 +34,33 @@ Contributions:
 * Neelabh Rana:
 (In Implementation using Linked List)
 >Class: Node,Node_daily.
+
 >Functions:Functions of insertion,deletion,printing list and their subfunctions,reminder,alaram,
  edit_task.
+
 >Blocks/feature: Daily task Block,username and password feature.
 
 * Atik Vohra:
 (In Implementation using Linked List)
->Functions: Extract-date,Extract_time,correct_date,corrrect_time and their subfunctions
->Blocks/feature: Priority block
+>Functions: Extract-date,Extract_time,correct_date,corrrect_time and their subfunctions.
+
+>Blocks/feature: Priority block.
+
 >GUI: HTML,CSS,Js based GUI.(Designed specially for mobile use)
 
 * Soham Mevada:
 (In implementation using tables)
 >Class:task,date,time.
+
 >Sub Functions: priority queue , comparator.
+
 >Functions: create task , show task.
+
 >GUI: TaskManager App.
 
 * Akshat Bhatt:
 (In implementation using tables)
 >Functions: Delete task, reminder,task adder.
+
 >Pdf documentation.
 
