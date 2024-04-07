@@ -629,3 +629,15 @@ body {
     font-weight: 600;
     
 }
+/* You may need to adjust the styles based on your design */
+.search-bar {
+    margin-bottom: 10px;
+}
+
+.task-search-input {
+    width: 100%;
+    padding: 8px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    font-size: 14px;
+}

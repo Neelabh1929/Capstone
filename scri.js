@@ -7,7 +7,6 @@ const defaultCategoryImage = "design1.jpg";
 const toggleScreen = () => {
     wrapper.classList.toggle('show-category');
 };
-
 menuBtn.addEventListener('click', toggleScreen);
 backBtn.addEventListener('click', toggleScreen);
 
@@ -20,9 +19,9 @@ const toggleAddTaskForm = () => {
     blackBackdrop.classList.toggle('active');
     addTaskBtn.classList.toggle('active');
 };
-
 addTaskBtn.addEventListener('click', toggleAddTaskForm);
 blackBackdrop.addEventListener('click', toggleAddTaskForm);
+
 
 let categories = JSON.parse(localStorage.getItem('categories')) ||  [
     {id: 1, 
@@ -378,7 +377,54 @@ return Math.floor(timeDifference / (1000 * 60 * 60));};
   updateReminderSection();
 setInterval(updateReminderSection, 1000);
 
+// const filterTasks = (categoryTasksContainer, query) => {
+//     const tasks = categoryTasksContainer.querySelectorAll('.task-wrapper');
+//     tasks.forEach(task => {
+//       const description = task.querySelector('.task-details p').textContent.toLowerCase();
+//       if (description.includes(query.toLowerCase())) {
+//         task.style.display = 'block';
+//       } else {
+//         task.style.display = 'none';
+//       }
+//     });
+//   };
+//   document.querySelectorAll('.task-search').forEach(searchInput => {
+//     searchInput.addEventListener('input', () => {
+//       const query = searchInput.value.trim();
+//       const categoryTasksContainer = searchInput.closest('.category').querySelector('.tasks');
+//       filterTasks(categoryTasksContainer, query);
+//     });
+//   });
 
+// function filterTasks(searchQuery, tasks) {
+//     return tasks.filter(task => task.textContent.toLowerCase().includes(searchQuery.toLowerCase()));
+// }
+
+// function handleSearchInputChange(event) {
+//     // event.stopPropagation(); 
+//     const searchQuery = event.target.value.trim();
+//     const tasks = Array.from(this.closest('.tasks').querySelectorAll('.task p'));
+//     const filteredTasks = filterTasks(searchQuery, tasks);
+
+//     tasks.forEach(taskWrapper => {
+//         const taskDescription = taskWrapper.querySelector('.task-details p').textContent.trim().toLowerCase();
+//         if (taskDescription.includes(searchQuery)) {
+//             taskWrapper.style.display = 'flex';
+//         } else {
+//             taskWrapper.style.display = 'none';
+//         }
+//     });
+// }
+
+// Add event listeners to search inputs
+// const searchInputs = document.querySelectorAll('.task-search-input');
+// searchInputs.forEach(input => {
+//     input.addEventListener('input', handleSearchInputChange);
+// });
+// const searchInputs = document.querySelectorAll('.task-search');
+// searchInputs.forEach(input => {
+//     input.addEventListener('input', handleSearchInputChange);
+// });
 getLocal();
 calculateTotal();
 renderCategories();
