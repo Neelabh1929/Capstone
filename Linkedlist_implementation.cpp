@@ -361,7 +361,7 @@ void insert_task()
     cout<<cyan<<endl;
     cout << "Enter the type of task:"<<colorend << endl;
     string task_type_user;
-    cin.ignore(); // to ignore the newline character from the buffer
+    cin.ignore();
     getline(cin, task_type_user);
 
     cout <<cyan<< "Enter the Integral Importance level of this task:" <<colorend<< endl;
@@ -372,8 +372,6 @@ void insert_task()
         cout<<red<<"Please enter positive integer as importance level."<<colorend<<endl;
         cin>>imp_lvl_user;
     } */
-
-    cin.ignore(); // to ignore the newline character from the buffer
     string deadlinedate, deadlinetime, message;
 
 again: // Brings here when deadline entered is already expired
@@ -817,7 +815,6 @@ void reschedule(string username)
     while (cnt < k || k == 0 || cnt<0)
     {
         cout <<red<< "Enter a valid task number to be rescheduled"<<colorend << endl;
-        cin.ignore(numeric_limits<streamsize>::max(), '\n');
         cin >> k;
     }
     string deadlinedate, deadlinetime, message;
@@ -889,7 +886,6 @@ void edit_task(string username)
     while (cnt < k || k == 0 || cnt<0)
     {
         cout <<red<<"Enter a valid task number(Either you entered 0 or there are less task then your number)"<<colorend << endl;
-        cin.ignore(numeric_limits<streamsize>::max(), '\n');
         cin >> k;
     }
     ll counter;
@@ -914,7 +910,6 @@ void edit_task(string username)
     {
         cout << cyan<<endl<<"Enter the new importance level:"<<colorend << endl;
         ll task_imp_lvl;
-        cin.ignore(numeric_limits<streamsize>::max(), '\n'); // igonres newline char
         cin >> task_imp_lvl;
         temp->imp_lvl = task_imp_lvl;
         writeDataToFile(username);
@@ -1006,7 +1001,6 @@ void insert_daily_task()
     }
     while (deadlinetime.size() != 6 || !correct_time(deadlinetime))
     {
-        cin.ignore(numeric_limits<streamsize>::max(), '\n'); // igonres newline char
         getline(cin, deadlinetime);
         if (deadlinetime.size() != 6 || !correct_time(deadlinetime))
         {
