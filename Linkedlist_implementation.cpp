@@ -1212,10 +1212,6 @@ void writeuser_pass(const vector<pair<string, string> > &user_pass)
         }
         outfile.close();
     }
-    else
-    {
-        cout << red<<"Unable to open file for writing."<<colorend << endl;
-    }
 }
 
 void readuser_pass(vector<pair<string, string> >&user_pass)
@@ -1235,12 +1231,6 @@ void readuser_pass(vector<pair<string, string> >&user_pass)
             }
         }
         infile.close();
-    }
-    else
-    {
-        cout << "File does not exist. Creating new file." << endl;
-        ofstream outfile("user_pass.txt");
-        outfile.close();
     }
 }
 
@@ -1267,7 +1257,7 @@ int main()
     if (user_login == 1)
     {
         cout<<endl;
-        cout << "Enter the username ("<<underlinedgray<<"CASE SENSITIVE and WITHOUT SPACE"<<colorend<<") : " << endl;
+        cout<<Upurple << "Enter the username ("<<underlinedgray<<"CASE SENSITIVE and WITHOUT SPACE"<<colorend<<") : "<<colorend << endl;
         cout<<dgray;
         cin >> username;
         unames.insert(username);
