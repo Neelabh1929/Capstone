@@ -65,5 +65,7 @@ Contributions:
 (In implementation using tables)
 >Functions: Delete task, reminder,task adder.
 
+>Written pseudocode and time complexities of both the implementation.
+
 >Pdf documentation.
 
