@@ -1,4 +1,7 @@
-# Capstone
+# Capstone:(P-11)
+
+PROJECT 11 : REMINDER AND TASK MANAGER:
+
 
 Contributors:
 (Team ASAN)
@@ -10,7 +13,10 @@ Contributors:
 
 GUI LINK:  https://atikdagu.github.io/todoweb/
 
-This Repo. is for the CAPSTONE project (IT-205) of team ASAN.
+This Repo. is for the CAPSTONE project (IT-205) of team ASAN (P-11).
+
+PROJECT DETAILS:
+
 
 Our Project aims to make a application that manages tasks and schedules, using data structures to
 prioritize and track tasks based on deadlines or importance levels.It also has the functionality of reminder as the deadline approaches.
