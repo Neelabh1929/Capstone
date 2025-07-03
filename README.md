@@ -6,7 +6,7 @@
 - **Soham Mevada** (`sohamMevada`)  
 - **Akshat Bhatt** (`akshatbhatt51`)
 
-🔗 **Live GUI**: [Click Here to Try the Web App](https://atikdagu.github.io/todoweb/)
+🔗 **Live GUI**: [Click Here to Try the Web App](https://atik-7866.github.io/todoweb/)
 
 ---
 
