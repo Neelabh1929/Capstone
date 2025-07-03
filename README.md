@@ -33,7 +33,7 @@
 - 🔧 Implemented using a mix of **linked lists** and **table-based structures**
 - 🧮 Prioritization through custom **priority queues**
 - 🔐 Secure login & user management  
-- 💻 Backend logic built for **TDM-GCC 4.9.2** compiler  
+- 💻 Tabular Implementation built for **TDM-GCC 4.9.2** compiler  
 - 🌐 Frontend powered by **HTML, CSS, and JavaScript**
 
 ---
