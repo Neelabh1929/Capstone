@@ -1,75 +1,69 @@
-# Capstone:(P-11)
+# 📝  Reminder & Task Manager
 
-PROJECT 11 : REMINDER AND TASK MANAGER:
+👥 **Team ASAN**  
+- **Neelabh Rana** (`Neelabh1929`)  
+- **Atik Vohra** (`atikdagu`)  
+- **Soham Mevada** (`sohamMevada`)  
+- **Akshat Bhatt** (`akshatbhatt51`)
+
+🔗 **Live GUI**: [Click Here to Try the Web App](https://atikdagu.github.io/todoweb/)
+
+---
+
+## 📌 Project Overview
+
+**Reminder & Task Manager** is a group project developed to help users manage their tasks and schedules more efficiently. It’s designed to keep users on track with built-in reminders, alarms, and task prioritization features — all packed into an intuitive mobile-first interface.
+
+---
+
+## 🚀 Key Features
+
+✅ Add, delete, edit, and reschedule tasks  
+⏰ Get reminders 12 hours before deadlines  
+🚨 Receive alarms for overdue tasks  
+📅 Maintain a daily task list with edit/delete functionality  
+📊 Sort tasks by priority or deadline  
+👥 Multi-user support with login/signup and password security  
+📱 Responsive, mobile-optimized interface
+
+---
+
+## ⚙️ Technical Highlights
+
+- 🔧 Implemented using a mix of **linked lists** and **table-based structures**
+- 🧮 Prioritization through custom **priority queues**
+- 🔐 Secure login & user management  
+- 💻 Backend logic built for **TDM-GCC 4.9.2** compiler  
+- 🌐 Frontend powered by **HTML, CSS, and JavaScript**
+
+---
+
+## 📷 Sneak Peek
+
+![Task Manager UI](https://github.com/Neelabh1929/Capstone/raw/daf3ec1378e71091c03fcef72b2e8ce7c3974b40/img/Previed_img.png)
 
 
-Contributors:
-(Team ASAN)
-* Neelabh1929 (Neelabh Rana)(202301476)
-* atikdagu (Atik Vohra)(202301447)
-* sohamMevada (Soham Mevada)(202301484)
-* akshatbhatt51 (Akshat Bhatt)(202301460)
+---
 
+## 📁 Project Structure
 
-GUI LINK:  https://atikdagu.github.io/todoweb/
+```bash
+📦 Reminder-And-Task-Manager
+├── src/
+│   ├── Linkedlist_implementation.cpp
+│   ├── tabular_implementation.cpp
+│   └── ...
+├── GUI/
+│   ├── index.html
+│   ├── style.css
+│   └── scri.js
+├── README.md
+│   └── ...
+├── Fonts/Inter
+│   └── ...
+├── img
+│   └── ...
+└──  Docs_and_Videos
+    └── ...
 
-This Repo. is for the CAPSTONE project (IT-205) of team ASAN (P-11).
-
-PROJECT DETAILS:
-
-
-Our Project aims to make a application that manages tasks and schedules, using data structures to
-prioritize and track tasks based on deadlines or importance levels.It also has the functionality of reminder as the deadline approaches.
-
-
-(CONTRIBUTION IS AFTER FUNCTIONALITY)
-
-Functionality:
-
-1. Insertion of task. 
-2. Deletion,editing and rescheduling of task.
-3. Reminder which comes 12hr. prior to the task deadline.
-4. Alaram for the task whose deadline is over.
-5. Daily task list and reminder.
-6. Insertion, deletion of tasks in daily task list.
-7. Sorting of task as per schedule.
-8. User sign up, login, password setting. Multiple user accounts can be handeled. 
-
-Dependencies for Implementation using tables:
-* Code needs to be compiled on TDM GCC 4.9.2 compiler.
-
-Contributions:
-
-* Neelabh Rana:
-(In Implementation using Linked List)
->Class: Node,Node_daily.
-
->Functions:Functions of insertion,deletion,printing list and their subfunctions,reminder,alarm,
- edit_task.
-
->Blocks/feature: Daily task Block,username and password feature.
-
-* Atik Vohra:
-(In Implementation using Linked List)
->Functions: Extract-date,Extract_time,correct_date,corrrect_time and their subfunctions.
-
->Blocks/feature: Priority block.
-
->GUI: HTML,CSS,Js based GUI.(Designed specially for mobile use)
-
-* Soham Mevada:
-(In implementation using tables)
->Class:task,date,time.
-
->Sub Functions: priority queue , comparator.
-
->Functions: create task , show task.
-
->GUI: TaskManager App.
-
-* Akshat Bhatt:
-(In implementation using tables)
->Functions: Delete task, reminder,task adder.
-
->Pdf documentation.
 
